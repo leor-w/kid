@@ -1,0 +1,8 @@
+logger:
+  level: 3 # 日志默认输出等级 3 = info
+  name: kid # 日志的前缀名称
+  reportCaller: false # 是否启动输出调用信息 默认为 false
+  path: "./logs" # 日志文件存放路径
+  link: link/dir/file # 日志文件自动软连接到指定位置
+  rotation: 24  # 日志分割时长
+  maxAge: 14 # 日志长保留时间

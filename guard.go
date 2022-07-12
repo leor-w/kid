@@ -1,0 +1,23 @@
+package kid
+
+import "time"
+
+type User struct {
+	Id   int64 `json:"id"`
+	Type int8  `json:"type"`
+}
+
+// Guard API 入口守卫
+type Guard interface {
+	License(*User) (string, error) // 发行牌照
+	Verify(string) (*User, error)  // 验证牌照
+	Cancellation() error           // 吊销牌照
+	ExpiresAt() int64              // 获取牌照有效时间
+	IssuerAt() int64               // 获取牌照发行时间
+}
+
+// Blacklist 黑名单列表
+type Blacklist interface {
+	Black(string, time.Duration) error // 将牌照加入黑名单
+	Checklist(string) (bool, error)    // 检查牌照是否在黑名单列表中
+}
