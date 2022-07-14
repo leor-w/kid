@@ -51,6 +51,10 @@ func (remote *viperRemote) OnWatch(watching func()) error {
 	return nil
 }
 
+func (remote *viperRemote) Exist(key string) bool {
+	return remote.IsSet(key)
+}
+
 func (remote *viperRemote) init() error {
 	isSecret := len(remote.options.gpgKey) == 0
 	for _, endpoint := range remote.options.endpoints {

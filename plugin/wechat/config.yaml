@@ -1,0 +1,8 @@
+wechat:
+  appid: appid
+  mini:
+    secret: secret
+  pay:
+    mchid: mchid
+    key: key
+    notifyUrl: https://kid.com/api/callback

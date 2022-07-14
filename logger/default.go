@@ -8,6 +8,10 @@ func Init(log Logger) {
 	logger = log
 }
 
+func Default() Logger {
+	return logger
+}
+
 func UserHook(hook Hook) {
 	logger.Hook(hook)
 }

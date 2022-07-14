@@ -3,8 +3,8 @@ package redis
 import "time"
 
 type Options struct {
-	Addr         string
-	Port         string
+	Host         string
+	Port         int
 	DbNum        int
 	Password     string
 	DialTimeout  time.Duration
@@ -17,13 +17,13 @@ type Options struct {
 	MinIdleConn  int
 }
 
-func WithAddr(addr string) Option {
+func WithHost(host string) Option {
 	return func(o *Options) {
-		o.Addr = addr
+		o.Host = host
 	}
 }
 
-func WithPort(port string) Option {
+func WithPort(port int) Option {
 	return func(o *Options) {
 		o.Port = port
 	}

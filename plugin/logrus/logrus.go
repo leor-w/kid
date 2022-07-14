@@ -14,6 +14,10 @@ type logrusLogger struct {
 	logger *logrus.Entry
 }
 
+func (log *logrusLogger) Provide() interface{} {
+	return Default()
+}
+
 type Option func(*Options)
 
 func (log *logrusLogger) Init(opts ...logger.Option) error {

@@ -27,25 +27,20 @@ type Option func(*Options)
 
 // Registry 将插件注入容器
 func (kid *Kid) Registry(plugin plugin.Plugin, opts ...container.Option) *Kid {
-	if err := kid.iocContainer.Provide(plugin, opts...); err != nil {
+	if err := kid.iocContainer.Provide(plugin.Provide(), opts...); err != nil {
 		logger.Fatal(err.Error())
 	}
 	return kid
 }
 
 func (kid *Kid) loadConfig() error {
-	conf := config.New(config.WithProviders(kid.Options.Configs))
-	if err := conf.Init(); err != nil {
-		return err
-	}
+	_ = config.New(config.WithProviders(kid.Options.Configs))
 	kid.loadFlag |= loadConfigFlag
 	return nil
 }
 
 func (kid *Kid) loadLogger() error {
-	//logger.Default()
-	log := logrus.Default()
-	logger.Init(log)
+	logger.Init(logrus.Default())
 	kid.loadFlag |= loadLoggerFlag
 	return nil
 }
@@ -55,10 +50,21 @@ func (kid *Kid) Launch(hosts ...string) {
 	if len(hosts) > 0 {
 		host = hosts[0]
 	}
+	if kid.loadFlag < loadLoggerFlag|loadConfigFlag {
+		panic("kid.Launch: failed: you must be call loadLogger or loadConfig")
+	}
 	if err := kid.iocContainer.Populate(); err != nil {
 		logger.Fatalf("kid.Launch: failed: %s", err.Error())
 	}
-	kid.Run(host)
+	_ = kid.Run(host)
+}
+
+func (kid *Kid) NoRoute(handleFunc HandleFunc) {
+	kid.Engine.NoRoute(convertHandleFunc(handleFunc))
+}
+
+func (kid *Kid) NoMethod(handleFunc HandleFunc) {
+	kid.Engine.NoMethod(convertHandleFunc(handleFunc))
 }
 
 func New(opts ...Option) *Kid {
@@ -72,6 +78,9 @@ func New(opts ...Option) *Kid {
 		RouterGroup:  &RouterGroup{&engine.RouterGroup},
 		iocContainer: container.New(),
 		Options:      opt,
+	}
+	if err := kid.loadLogger(); err != nil {
+		panic(err.Error())
 	}
 	if err := kid.loadConfig(); err != nil {
 		panic(err.Error())

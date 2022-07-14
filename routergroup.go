@@ -46,7 +46,7 @@ func convert(handler HandleFunc, middlewares ...Middleware) []gin.HandlerFunc {
 
 func convertHandleFunc(handler HandleFunc) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		resp := handler(&Context{ctx})
+		resp := handler(&Context{Context: ctx})
 		ctx.JSON(http.StatusOK, resp)
 	}
 }
@@ -56,7 +56,7 @@ func convertMiddleware(middlewares ...Middleware) []gin.HandlerFunc {
 	for i, _ := range middlewares {
 		handler := middlewares[i]
 		ginMiddlewares[i] = func(ctx *gin.Context) {
-			handler(&Context{ctx})
+			handler(&Context{Context: ctx})
 		}
 	}
 	return ginMiddlewares

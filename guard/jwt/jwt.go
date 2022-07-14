@@ -4,25 +4,33 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/leor-w/kid"
+	"github.com/leor-w/kid/config"
+	"github.com/leor-w/kid/guard"
 	"time"
 )
 
 type Jwt struct {
-	license   string
-	claims    *kidClaims
-	Blacklist kid.Blacklist
+	Blacklist guard.Blacklist
 	options   *Options
 }
 
+func (guard *Jwt) Provide() interface{} {
+	return New(
+		WithIssuer(config.GetString("jwt.issuer")),
+		WithExpire(config.GetDuration("jwt.expire")*time.Hour*24),
+		WithSigningMethod(SigningMethod(config.GetString("jwt.signingMethod"))),
+		WithKey([]byte(config.GetString("jwt.secret"))),
+	)
+}
+
 type kidClaims struct {
-	User *kid.User
+	User *guard.User
 	jwt.StandardClaims
 }
 
 type Option func(*Options)
 
-func (guard *Jwt) License(user *kid.User) (string, error) {
+func (guard *Jwt) License(user *guard.User) (string, error) {
 	token := jwt.NewWithClaims(guard.getSignMethod(), &kidClaims{
 		User: user,
 		StandardClaims: jwt.StandardClaims{
@@ -32,14 +40,49 @@ func (guard *Jwt) License(user *kid.User) (string, error) {
 		},
 	})
 	var err error
-	guard.license, err = token.SignedString(guard.options.SigningMethod)
+	license, err := token.SignedString(guard.options.SigningMethod)
 	if err != nil {
 		return "", fmt.Errorf("jwt.License: signed string failed: %w", err)
 	}
-	return guard.license, nil
+	return license, nil
 }
 
-func (guard *Jwt) Verify(license string) (*kid.User, error) {
+func (guard *Jwt) Verify(license string) (*guard.User, error) {
+	token, err := guard.parseToken(license)
+	if err != nil {
+		return nil, err
+	}
+	if claims, ok := token.Claims.(*kidClaims); ok && token.Valid {
+		return claims.User, nil
+	}
+	return nil, fmt.Errorf("jwt.Verify: token valid failed")
+}
+
+func (guard *Jwt) Cancellation(license string) error {
+	token, err := guard.parseToken(license)
+	if err != nil {
+		return err
+	}
+	return guard.Blacklist.Black(license, time.Duration(token.Claims.(*kidClaims).ExpiresAt-time.Now().Unix()))
+}
+
+func (guard *Jwt) ExpiresAt(license string) int64 {
+	token, err := guard.parseToken(license)
+	if err != nil {
+		return 0
+	}
+	return token.Claims.(*kidClaims).ExpiresAt
+}
+
+func (guard *Jwt) IssuerAt(license string) int64 {
+	token, err := guard.parseToken(license)
+	if err != nil {
+		return 0
+	}
+	return token.Claims.(*kidClaims).IssuedAt
+}
+
+func (guard *Jwt) parseToken(license string) (*jwt.Token, error) {
 	isBlack, err := guard.Blacklist.Checklist(license)
 	if err != nil {
 		return nil, fmt.Errorf("jwt.Verify: check blacklist failed: %w", err)
@@ -56,23 +99,7 @@ func (guard *Jwt) Verify(license string) (*kid.User, error) {
 	if token == nil {
 		return nil, fmt.Errorf("jwt.Verify: parse token to claims was nil")
 	}
-	if claims, ok := token.Claims.(*kidClaims); ok && token.Valid {
-		guard.claims = claims
-		return claims.User, nil
-	}
-	return nil, fmt.Errorf("jwt.Verify: token valid failed")
-}
-
-func (guard *Jwt) Cancellation() error {
-	return guard.Blacklist.Black(guard.license, time.Duration(guard.claims.ExpiresAt-time.Now().Unix()))
-}
-
-func (guard *Jwt) ExpiresAt() int64 {
-	return guard.claims.ExpiresAt
-}
-
-func (guard *Jwt) IssuerAt() int64 {
-	return guard.claims.IssuedAt
+	return token, nil
 }
 
 func (guard *Jwt) getSignMethod() *jwt.SigningMethodHMAC {
@@ -85,5 +112,15 @@ func (guard *Jwt) getSignMethod() *jwt.SigningMethodHMAC {
 		return jwt.SigningMethodHS512
 	default:
 		return jwt.SigningMethodHS256
+	}
+}
+
+func New(opts ...Option) *Jwt {
+	var options = Options{}
+	for _, o := range opts {
+		o(&options)
+	}
+	return &Jwt{
+		options: &options,
 	}
 }

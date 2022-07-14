@@ -1,0 +1,5 @@
+jwt:
+  issuer: kid
+  expire: 1 # day
+  signingMethod: sha256
+  secret: kid_secret

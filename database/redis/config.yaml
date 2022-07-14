@@ -1,0 +1,13 @@
+redis:
+  host: http://127.0.0.1
+  port: 6379
+  db: 0
+  password: secret
+  dialTimeout: 3 # second
+  readTimeout: 3 # second
+  writeTimeout: 3 # second
+  maxConnAge: 8 # hour
+  poolTimeout: 3 # second
+  idleTimeout: 3 # minute
+  poolSize: 50
+  minIdleConn: 10

@@ -2,11 +2,13 @@ package kid
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/leor-w/kid/guard"
 	"github.com/spf13/cast"
 )
 
 type Context struct {
 	*gin.Context
+	Guard guard.Guard
 }
 
 func (ctx *Context) GetInt(key string) int {

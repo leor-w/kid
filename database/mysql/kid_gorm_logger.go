@@ -12,7 +12,7 @@ import (
 )
 
 type KidLogger struct {
-	*logger.Logger
+	logger.Logger
 	*gLogger.Config
 	infoStr, warnStr, errStr            string
 	traceStr, traceErrStr, traceWarnStr string
@@ -38,7 +38,7 @@ func NewKidLogger(config *gLogger.Config) gLogger.Interface {
 	}
 
 	return &KidLogger{
-		Logger:       logger.NewLogger(nil),
+		Logger:       logger.Default(),
 		Config:       config,
 		infoStr:      infoStr,
 		warnStr:      warnStr,
