@@ -19,6 +19,7 @@ func (guard *Token) Provide() interface{} {
 		panic("not found [token] in config")
 	}
 	token = New(
+		WithSecret(config.GetString("token.secret")),
 		WithExpire(config.GetInt("token.expire")),
 	)
 	return token
