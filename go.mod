@@ -3,6 +3,8 @@ module github.com/leor-w/kid
 go 1.17
 
 require (
+	github.com/casbin/casbin/v2 v2.51.0
+	github.com/casbin/gorm-adapter/v3 v3.7.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/gin-gonic/gin v1.8.1
@@ -24,8 +26,6 @@ require (
 require (
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d // indirect
-	github.com/casbin/casbin/v2 v2.51.0 // indirect
-	github.com/casbin/gorm-adapter/v3 v3.7.3 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/denisenkom/go-mssqldb v0.12.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -41,6 +41,7 @@ require (
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.0.0-20170517235910-f1bb20e5a188 // indirect
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.11.0 // indirect
