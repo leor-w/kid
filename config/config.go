@@ -1,11 +1,9 @@
 package config
 
 import (
-	"errors"
 	"github.com/leor-w/kid/config/local"
 	"github.com/leor-w/utils"
 	"github.com/spf13/cast"
-	"net/url"
 	"time"
 )
 
@@ -36,10 +34,10 @@ func WithProviders(providers []string) Option {
 
 func (conf *Config) Init() error {
 	for _, provider := range conf.options.Providers {
-		_, err := url.Parse(provider)
-		if err == nil {
-			return errors.New("remote configuration not currently supported")
-		}
+		//_, err := url.Parse(provider)
+		//if err == nil {
+		//	return errors.New("remote configuration not currently supported")
+		//}
 		dir, name, ext := utils.ParsePath(provider)
 		conf.Provider(local.New(local.WithConfigPath(dir),
 			local.WithConfigName(name),
