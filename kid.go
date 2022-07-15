@@ -34,7 +34,10 @@ func (kid *Kid) Registry(plugin plugin.Plugin, opts ...container.Option) *Kid {
 }
 
 func (kid *Kid) loadConfig() error {
-	_ = config.New(config.WithProviders(kid.Options.Configs))
+	_ = config.New(
+		config.WithProviders(kid.Options.Configs),
+		config.WithDefault(true),
+	)
 	kid.loadFlag |= loadConfigFlag
 	return nil
 }

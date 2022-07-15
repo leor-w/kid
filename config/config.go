@@ -24,11 +24,18 @@ type Option func(*Options)
 
 type Options struct {
 	Providers []string
+	Default   bool
 }
 
 func WithProviders(providers []string) Option {
 	return func(o *Options) {
 		o.Providers = providers
+	}
+}
+
+func WithDefault(isDefault bool) Option {
+	return func(o *Options) {
+		o.Default = isDefault
 	}
 }
 
@@ -42,6 +49,9 @@ func (conf *Config) Init() error {
 		conf.Provider(local.New(local.WithConfigPath(dir),
 			local.WithConfigName(name),
 			local.WithConfigType(ext)))
+	}
+	if conf.options.Default {
+		defaultConfig = conf
 	}
 	return nil
 }
