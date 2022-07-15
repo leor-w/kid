@@ -17,7 +17,7 @@ type Option func(*Options)
 
 func (ctrl *Controller) Init() error {
 	opt := ctrl.options
-	host := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf-8", opt.user, opt.pwd, opt.host, opt.port, opt.dbname)
+	host := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", opt.user, opt.pwd, opt.host, opt.port, opt.dbname)
 	adapter, err := gormadapter.NewAdapter("mysql", host, true)
 	if err != nil {
 		return err
