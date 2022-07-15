@@ -79,10 +79,10 @@ func New(opts ...Option) *Kid {
 		iocContainer: container.New(),
 		Options:      opt,
 	}
-	if err := kid.loadLogger(); err != nil {
+	if err := kid.loadConfig(); err != nil {
 		panic(err.Error())
 	}
-	if err := kid.loadConfig(); err != nil {
+	if err := kid.loadLogger(); err != nil {
 		panic(err.Error())
 	}
 	return kid
