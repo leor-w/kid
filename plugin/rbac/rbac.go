@@ -34,8 +34,11 @@ func (ctrl *Controller) Init() error {
 }
 
 func (ctrl *Controller) Provide() interface{} {
+	if !config.Exist("rbac") {
+		panic("not found [rbac] in config")
+	}
 	defaultRbac = New(
-		WithModelConf("./conf/rbac_models.conf"),
+		WithModelConf(config.GetString("rbac.model")),
 		WithEnableLog(config.GetBool("rbac.enableLog")),
 		WithUser(config.GetString("rbac.db.user")),
 		WithPwd(config.GetString("rbac.db.pwd")),

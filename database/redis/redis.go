@@ -13,6 +13,9 @@ type Client struct {
 }
 
 func (cli *Client) Provide() interface{} {
+	if !config.Exist("redis") {
+		panic("not found [redis] in config")
+	}
 	return New(
 		WithHost(config.GetString("redis.host")),
 		WithPort(config.GetInt("redis.port")),

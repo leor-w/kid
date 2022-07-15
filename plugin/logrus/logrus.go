@@ -15,6 +15,9 @@ type logrusLogger struct {
 }
 
 func (log *logrusLogger) Provide() interface{} {
+	if !config.Exist("logger") {
+		panic("not found [logger] in config")
+	}
 	return Default()
 }
 

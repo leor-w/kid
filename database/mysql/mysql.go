@@ -17,6 +17,9 @@ type Conn struct {
 }
 
 func (conn *Conn) Provide() interface{} {
+	if !config.Exist("mysql") {
+		panic("not found [mysql] in config")
+	}
 	return New(
 		WithHost(config.GetString("mysql.host")),
 		WithPort(config.GetInt("mysql.port")),

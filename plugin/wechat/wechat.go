@@ -20,6 +20,9 @@ type Wechat struct {
 }
 
 func (w *Wechat) Provide() interface{} {
+	if !config.Exist("wechat") {
+		panic("not found [wechat] in config")
+	}
 	return New(
 		WithAppid(config.GetString("wechat.appid")),
 		WithMiniSecret(config.GetString("wechat.mini.secret")),

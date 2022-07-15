@@ -13,6 +13,9 @@ type Qiniu struct {
 }
 
 func (qiniu *Qiniu) Provide() interface{} {
+	if !config.Exist("qiniu") {
+		panic("not found [qiniu] in config")
+	}
 	return New(
 		WithDomain(config.GetString("qiniu.domain")),
 		WithBucket(config.GetString("qiniu.bucket")),

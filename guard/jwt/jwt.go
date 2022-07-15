@@ -15,6 +15,9 @@ type Jwt struct {
 }
 
 func (guard *Jwt) Provide() interface{} {
+	if !config.Exist("jwt") {
+		panic("not found [jwt] in config")
+	}
 	return New(
 		WithIssuer(config.GetString("jwt.issuer")),
 		WithExpire(config.GetDuration("jwt.expire")*time.Hour*24),
