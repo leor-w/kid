@@ -46,9 +46,13 @@ func (conf *Config) Init() error {
 		//	return errors.New("remote configuration not currently supported")
 		//}
 		dir, name, ext := utils.ParsePath(provider)
-		conf.Provider(local.New(local.WithConfigPath(dir),
+		localProvider := local.New(local.WithConfigPath(dir),
 			local.WithConfigName(name),
-			local.WithConfigType(ext)))
+			local.WithConfigType(ext))
+		if err := localProvider.ReadInConfig(); err != nil {
+			return err
+		}
+		conf.Provider(localProvider)
 	}
 	if conf.options.Default {
 		defaultConfig = conf
