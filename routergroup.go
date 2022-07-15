@@ -34,7 +34,7 @@ func (group *RouterGroup) Group(path string, middlewares ...Middleware) *RouterG
 	return &RouterGroup{group.group.Group(path, convertMiddleware(middlewares...)...)}
 }
 
-func (group *RouterGroup) Use(middlewares ...Middleware) {
+func (group *RouterGroup) UseMiddle(middlewares ...Middleware) {
 	group.group.Use(convertMiddleware(middlewares...)...)
 }
 

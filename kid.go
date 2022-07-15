@@ -67,10 +67,6 @@ func (kid *Kid) NoMethod(handleFunc HandleFunc) {
 	kid.Engine.NoMethod(convertHandleFunc(handleFunc))
 }
 
-func (kid *Kid) User(middleware ...Middleware) {
-	kid.RouterGroup.Use(middleware...)
-}
-
 func New(opts ...Option) *Kid {
 	opt := &Options{}
 	for _, o := range opts {
