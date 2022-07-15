@@ -12,6 +12,7 @@ type DbOptions struct {
 	host   string
 	port   int
 	dbname string
+	table  string
 }
 
 func WithModelConf(modelConf string) Option {
@@ -53,5 +54,11 @@ func WithPort(port int) Option {
 func WithDbName(dbname string) Option {
 	return func(o *Options) {
 		o.dbname = dbname
+	}
+}
+
+func WithTable(table string) Option {
+	return func(o *Options) {
+		o.table = table
 	}
 }

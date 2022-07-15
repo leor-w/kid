@@ -45,6 +45,7 @@ func (ctrl *Controller) Provide() interface{} {
 		WithHost(config.GetString("rbac.db.host")),
 		WithPort(config.GetInt("rbac.db.port")),
 		WithDbName(config.GetString("rbac.db.name")),
+		WithTable(config.GetString("rbac.db.table")),
 	)
 	return defaultRbac
 }

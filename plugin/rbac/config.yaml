@@ -7,3 +7,4 @@ rbac:
     host: http://localhost
     port: 3306
     name: rbac
+    table: permission_rule
