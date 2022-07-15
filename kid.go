@@ -17,7 +17,7 @@ var (
 type Kid struct {
 	loadFlag int
 	*gin.Engine
-	*RouterGroup
+	RouterGroup
 	Logger       logger.Logger
 	iocContainer container.Container
 	Options      *Options
@@ -67,6 +67,10 @@ func (kid *Kid) NoMethod(handleFunc HandleFunc) {
 	kid.Engine.NoMethod(convertHandleFunc(handleFunc))
 }
 
+func (kid *Kid) User(middleware ...Middleware) {
+	kid.RouterGroup.Use(middleware...)
+}
+
 func New(opts ...Option) *Kid {
 	opt := &Options{}
 	for _, o := range opts {
@@ -75,7 +79,7 @@ func New(opts ...Option) *Kid {
 	engine := gin.New()
 	kid := &Kid{
 		Engine:       engine,
-		RouterGroup:  &RouterGroup{&engine.RouterGroup},
+		RouterGroup:  RouterGroup{&engine.RouterGroup},
 		iocContainer: container.New(),
 		Options:      opt,
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 type RouterGroup struct {
-	*gin.RouterGroup
+	group *gin.RouterGroup
 }
 
 type HandleFunc func(*Context) interface{}
@@ -15,27 +15,27 @@ type Middleware func(*Context)
 
 func (group *RouterGroup) POST(path string, handler HandleFunc, middlewares ...Middleware) {
 
-	group.RouterGroup.POST(path, convert(handler, middlewares...)...)
+	group.group.POST(path, convert(handler, middlewares...)...)
 }
 
 func (group *RouterGroup) GET(path string, handler HandleFunc, middlewares ...Middleware) {
-	group.RouterGroup.GET(path, convert(handler, middlewares...)...)
+	group.group.GET(path, convert(handler, middlewares...)...)
 }
 
 func (group *RouterGroup) PUT(path string, handler HandleFunc, middlewares ...Middleware) {
-	group.RouterGroup.PUT(path, convert(handler, middlewares...)...)
+	group.group.PUT(path, convert(handler, middlewares...)...)
 }
 
 func (group *RouterGroup) DELETE(path string, handler HandleFunc, middlewares ...Middleware) {
-	group.RouterGroup.DELETE(path, convert(handler, middlewares...)...)
+	group.group.DELETE(path, convert(handler, middlewares...)...)
 }
 
 func (group *RouterGroup) Group(path string, middlewares ...Middleware) *RouterGroup {
-	return &RouterGroup{group.RouterGroup.Group(path, convertMiddleware(middlewares...)...)}
+	return &RouterGroup{group.group.Group(path, convertMiddleware(middlewares...)...)}
 }
 
 func (group *RouterGroup) Use(middlewares ...Middleware) {
-	group.RouterGroup.Use(convertMiddleware(middlewares...)...)
+	group.group.Use(convertMiddleware(middlewares...)...)
 }
 
 func convert(handler HandleFunc, middlewares ...Middleware) []gin.HandlerFunc {
@@ -53,7 +53,7 @@ func convertHandleFunc(handler HandleFunc) gin.HandlerFunc {
 
 func convertMiddleware(middlewares ...Middleware) []gin.HandlerFunc {
 	var ginMiddlewares = make([]gin.HandlerFunc, len(middlewares))
-	for i, _ := range middlewares {
+	for i := range middlewares {
 		handler := middlewares[i]
 		ginMiddlewares[i] = func(ctx *gin.Context) {
 			handler(&Context{Context: ctx})
