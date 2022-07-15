@@ -20,16 +20,7 @@ func (conn *Conn) Provide() interface{} {
 	if !config.Exist("mysql") {
 		panic("not found [mysql] in config")
 	}
-	return New(
-		WithHost(config.GetString("mysql.host")),
-		WithPort(config.GetInt("mysql.port")),
-		WithUser(config.GetString("mysql.user")),
-		WithPassword(config.GetString("mysql.password")),
-		WithDb(config.GetString("mysql.database")),
-		WithMaxLife(config.GetDuration("mysql.maxLife")),
-		WithMaxIdle(config.GetInt("mysql.maxIdle")),
-		WithMaxOpen(config.GetInt("mysql.maxOpen")),
-	)
+	return Default()
 }
 
 type Option func(*Options)
@@ -73,4 +64,17 @@ func New(opts ...Option) *Conn {
 	}
 	conn.DB = db
 	return conn
+}
+
+func Default() *Conn {
+	return New(
+		WithHost(config.GetString("mysql.host")),
+		WithPort(config.GetInt("mysql.port")),
+		WithUser(config.GetString("mysql.user")),
+		WithPassword(config.GetString("mysql.password")),
+		WithDb(config.GetString("mysql.database")),
+		WithMaxLife(config.GetDuration("mysql.maxLife")),
+		WithMaxIdle(config.GetInt("mysql.maxIdle")),
+		WithMaxOpen(config.GetInt("mysql.maxOpen")),
+	)
 }
