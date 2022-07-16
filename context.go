@@ -7,7 +7,7 @@ import (
 )
 
 type Context struct {
-	gin.Context
+	*gin.Context
 	Guard guard.Guard
 }
 
