@@ -1,4 +1,4 @@
-package kid
+package kerrors
 
 import "fmt"
 
@@ -14,11 +14,13 @@ type Status struct {
 	Message string `json:"message"`
 }
 
+var UnknownError = &Status{Code: 10000, Message: "未知错误"}
+
 func (e *Error) Error() string {
 	return fmt.Sprintf("%s: %s", e.Status.Message, e.Original.Error())
 }
 
-func NewError(status *Status, originals ...error) *Error {
+func New(status *Status, originals ...error) *Error {
 	err := Error{Status: status}
 	if len(originals) > 1 {
 		err.Original = originals[0]
@@ -26,15 +28,21 @@ func NewError(status *Status, originals ...error) *Error {
 	return &err
 }
 
-func (e *Error) GetStatus() (int, string) {
-	return e.Status.Code, e.Status.Message
+func (e *Error) GetStatus() *Status {
+	return e.Status
 }
 
-func Value(e error) (int, string) {
+func GetStatus(e error) *Status {
 	switch err := e.(type) {
 	case *Error:
+
 		return err.GetStatus()
 	default:
-		return 500, "未知错误"
+		return UnknownError
 	}
+}
+
+func GetCodeMessage(e error) (int, string) {
+	status := GetStatus(e)
+	return status.Code, status.Message
 }
