@@ -1,9 +1,8 @@
-package validation
+package kid
 
 import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
-	"github.com/leor-w/kid"
 	"github.com/pkg/errors"
 	"reflect"
 )
@@ -16,7 +15,7 @@ func Struct(value interface{}) error {
 	return Validator.Struct(value)
 }
 
-func Verify(ctx *kid.Context, rules Rules) (err error) {
+func Verify(ctx *Context, rules Rules) (err error) {
 	var val = make(map[string]interface{})
 	for key, _ := range rules {
 		v, exist := ctx.Get(key)

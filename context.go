@@ -3,7 +3,6 @@ package kid
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/leor-w/kid/guard"
-	"github.com/leor-w/kid/validation"
 	"github.com/spf13/cast"
 )
 
@@ -16,14 +15,14 @@ func (ctx *Context) Valid(recipient interface{}) error {
 	if err := ctx.ShouldBind(&recipient); err != nil {
 		return err
 	}
-	if err := validation.Struct(recipient); err != nil {
+	if err := Struct(recipient); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ctx *Context) ValidFiled(rules validation.Rules) error {
-	return validation.Verify(ctx, rules)
+func (ctx *Context) ValidFiled(rules Rules) error {
+	return Verify(ctx, rules)
 }
 
 func (ctx *Context) GetInt(key string) int {
