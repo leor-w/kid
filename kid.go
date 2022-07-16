@@ -59,6 +59,7 @@ func (kid *Kid) Launch(hosts ...string) {
 	if err := kid.iocContainer.Populate(); err != nil {
 		logger.Fatalf("kid.Launch: failed: %s", err.Error())
 	}
+	kid.Engine.RouterGroup = *(kid.RouterGroup.group)
 	_ = kid.Run(host)
 }
 
