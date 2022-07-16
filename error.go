@@ -25,3 +25,16 @@ func NewError(status *Status, originals ...error) *Error {
 	}
 	return &err
 }
+
+func (e *Error) GetStatus() (int, string) {
+	return e.Status.Code, e.Status.Message
+}
+
+func Value(e error) (int, string) {
+	switch err := e.(type) {
+	case *Error:
+		return err.GetStatus()
+	default:
+		return 500, "未知错误"
+	}
+}
