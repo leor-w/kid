@@ -3,7 +3,7 @@ package container
 import (
 	"errors"
 	"fmt"
-	"github.com/leor-w/utils"
+	"github.com/leor-w/kid/utils"
 	"reflect"
 	"sync/atomic"
 	"unsafe"
@@ -124,9 +124,6 @@ func (c *container) populate(e *entity) error {
 		if !ok {
 			continue
 		}
-		if !f.CanSet() {
-			continue
-		}
 		ft := f.Type()
 		fe, err := c.Get(ft, tag)
 		if err != nil {
@@ -161,7 +158,22 @@ func (c *container) Invoke(fn interface{}) ([]reflect.Value, error) {
 func (c *container) Get(t reflect.Type, name string) (*entity, error) {
 	b, exist := c.buckets[t]
 	if !exist {
-		return nil, fmt.Errorf("container.Get: not found bucket [%v]", t)
+		//ct := utils.ConvertPointer(t)
+		//b, exist = c.buckets[ct]
+		//if !exist {
+		for k, v := range c.buckets {
+			if k.AssignableTo(t) || t.AssignableTo(k) {
+				t = k
+				b = v
+				break
+			}
+		}
+		if b == nil {
+			return nil, fmt.Errorf("container.Get: not found bucket [%v]", t)
+		}
+		//} else {
+		//	t = ct
+		//}
 	}
 	e := b.get(t, name)
 	if e == nil {

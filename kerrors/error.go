@@ -17,7 +17,14 @@ type Status struct {
 var UnknownError = &Status{Code: 10000, Message: "未知错误"}
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("%s: %s", e.Status.Message, e.Original.Error())
+	var errStr string
+	if e.Status != nil {
+		errStr = fmt.Sprintf("code: %d message: %s", e.Status.Code, e.Status.Message)
+	}
+	if e.Original != nil {
+		errStr = fmt.Sprintf("%s original error: %s", errStr, e.Original.Error())
+	}
+	return errStr
 }
 
 func New(status *Status, originals ...error) *Error {

@@ -6,7 +6,7 @@ import (
 )
 
 type RouterGroup struct {
-	group *gin.RouterGroup
+	*gin.RouterGroup
 }
 
 type HandleFunc func(*Context) interface{}
@@ -15,27 +15,27 @@ type Middleware func(*Context)
 
 func (group *RouterGroup) POST(path string, handler HandleFunc, middlewares ...Middleware) {
 
-	group.group.POST(path, convert(handler, middlewares...)...)
+	group.RouterGroup.POST(path, convert(handler, middlewares...)...)
 }
 
 func (group *RouterGroup) GET(path string, handler HandleFunc, middlewares ...Middleware) {
-	group.group.GET(path, convert(handler, middlewares...)...)
+	group.RouterGroup.GET(path, convert(handler, middlewares...)...)
 }
 
 func (group *RouterGroup) PUT(path string, handler HandleFunc, middlewares ...Middleware) {
-	group.group.PUT(path, convert(handler, middlewares...)...)
+	group.RouterGroup.PUT(path, convert(handler, middlewares...)...)
 }
 
 func (group *RouterGroup) DELETE(path string, handler HandleFunc, middlewares ...Middleware) {
-	group.group.DELETE(path, convert(handler, middlewares...)...)
+	group.RouterGroup.DELETE(path, convert(handler, middlewares...)...)
 }
 
 func (group *RouterGroup) Group(path string, middlewares ...Middleware) *RouterGroup {
-	return &RouterGroup{group.group.Group(path, convertMiddleware(middlewares...)...)}
+	return &RouterGroup{group.RouterGroup.Group(path, convertMiddleware(middlewares...)...)}
 }
 
 func (group *RouterGroup) UseMiddle(middlewares ...Middleware) {
-	group.group.Use(convertMiddleware(middlewares...)...)
+	group.RouterGroup.Use(convertMiddleware(middlewares...)...)
 }
 
 func convert(handler HandleFunc, middlewares ...Middleware) []gin.HandlerFunc {

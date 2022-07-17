@@ -156,6 +156,14 @@ func GetString(key string) string {
 	return defaultConfig.GetString(key)
 }
 
+func DefaultString(key, defaultVal string) string {
+	val := GetString(key)
+	if len(val) == 0 {
+		return defaultVal
+	}
+	return val
+}
+
 func GetStringSlice(key string) []string {
 	return defaultConfig.GetStringSlice(key)
 }

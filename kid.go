@@ -1,6 +1,7 @@
 package kid
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/container"
@@ -57,9 +58,8 @@ func (kid *Kid) Launch(hosts ...string) {
 		panic("kid.Launch: failed: you must be call loadLogger or loadConfig")
 	}
 	if err := kid.iocContainer.Populate(); err != nil {
-		logger.Fatalf("kid.Launch: failed: %s", err.Error())
+		panic(fmt.Sprintf("kid.Launch: failed: %s", err.Error()))
 	}
-	kid.Engine.RouterGroup = *(kid.RouterGroup.group)
 	_ = kid.Run(host)
 }
 
@@ -79,7 +79,7 @@ func New(opts ...Option) *Kid {
 	engine := gin.New()
 	kid := &Kid{
 		Engine:       engine,
-		RouterGroup:  RouterGroup{&engine.RouterGroup},
+		RouterGroup:  RouterGroup{&(engine.RouterGroup)},
 		iocContainer: container.New(),
 		Options:      opt,
 	}

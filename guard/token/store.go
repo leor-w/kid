@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/database/redis"
 	"time"
 )
@@ -19,7 +20,16 @@ type RedisStore struct {
 }
 
 func (rs *RedisStore) Provide() interface{} {
-	return &RedisStore{}
+	return NewStore(config.DefaultString("token.store", "redis"))
+}
+
+func NewStore(cacheType string) Store {
+	switch cacheType {
+	case "redis":
+		return &RedisStore{}
+	default:
+		return nil
+	}
 }
 
 func (rs *RedisStore) Get(token string) (*tokenInfo, error) {

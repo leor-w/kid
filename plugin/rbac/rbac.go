@@ -30,6 +30,8 @@ func (ctrl *Controller) Init() error {
 		return err
 	}
 	enforcer.EnableLog(opt.enableLog)
+	ctrl.adapter = adapter
+	ctrl.Enforcer = enforcer
 	return nil
 }
 
