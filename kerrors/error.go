@@ -29,7 +29,7 @@ func (e *Error) Error() string {
 
 func New(status *Status, originals ...error) *Error {
 	err := Error{Status: status}
-	if len(originals) > 1 {
+	if len(originals) > 0 {
 		err.Original = originals[0]
 	}
 	return &err
