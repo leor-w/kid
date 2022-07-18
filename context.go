@@ -25,43 +25,43 @@ func (ctx *Context) ValidFiled(rules Rules) error {
 	return Verify(ctx, rules)
 }
 
-func (ctx *Context) GetInt(key string) int {
-	return cast.ToInt(ctx.get(key))
+func (ctx *Context) FindInt(key string) int {
+	return cast.ToInt(ctx.find(key))
 }
 
-func (ctx *Context) GetDefaultInt(key string, defaultValue int) int {
-	val := ctx.GetInt(key)
+func (ctx *Context) FindDefaultInt(key string, defaultValue int) int {
+	val := ctx.FindInt(key)
 	if val > 0 {
 		return val
 	}
 	return defaultValue
 }
 
-func (ctx *Context) GetInt64(key string) int64 {
-	return cast.ToInt64(ctx.get(key))
+func (ctx *Context) FindInt64(key string) int64 {
+	return cast.ToInt64(ctx.find(key))
 }
 
-func (ctx *Context) GetDefaultInt64(key string, defaultValue int64) int64 {
-	val := ctx.GetInt64(key)
+func (ctx *Context) FindDefaultInt64(key string, defaultValue int64) int64 {
+	val := ctx.FindInt64(key)
 	if val > 0 {
 		return val
 	}
 	return defaultValue
 }
 
-func (ctx *Context) GetString(key string) string {
-	return ctx.get(key)
+func (ctx *Context) FindString(key string) string {
+	return ctx.find(key)
 }
 
-func (ctx *Context) GetDefaultString(key, defaultValue string) string {
-	val := ctx.get(key)
+func (ctx *Context) FindDefaultString(key, defaultValue string) string {
+	val := ctx.find(key)
 	if len(val) > 0 {
 		return val
 	}
 	return defaultValue
 }
 
-func (ctx *Context) get(key string) string {
+func (ctx *Context) find(key string) string {
 	var val string
 	val = ctx.Param(key)
 	if len(val) > 0 {
@@ -71,7 +71,7 @@ func (ctx *Context) get(key string) string {
 	if len(val) > 0 {
 		return val
 	}
-	val = ctx.GetString(key)
+	val = ctx.FindString(key)
 	if len(val) > 0 {
 		return val
 	}
