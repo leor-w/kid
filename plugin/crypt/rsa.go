@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"errors"
+	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/logger"
 	"io/ioutil"
 )
@@ -21,10 +22,10 @@ type Rsa struct {
 
 func (r *Rsa) Provide() interface{} {
 	return NewRsa(
-		WithPrivateKey("rsa.privateKey"),
-		WithPrivateKeyFile("rsa.privateKeyFile"),
-		WithPublicKey("rsa.publicKey"),
-		WithPublicKeyFile("rsa.publicKeyFile"),
+		WithPrivateKey(config.GetString("rsa.privateKey")),
+		WithPrivateKeyFile(config.GetString("rsa.privateKeyFile")),
+		WithPublicKey(config.GetString("rsa.publicKey")),
+		WithPublicKeyFile(config.GetString("rsa.publicKeyFile")),
 	)
 }
 
@@ -88,7 +89,7 @@ func (r *Rsa) LoadPrivateKey() (*rsa.PrivateKey, error) {
 	if block == nil {
 		return nil, errors.New("private key parse failed")
 	}
-	priKey, err := x509.ParsePKCS1PrivateKey(privateKey)
+	priKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}
@@ -119,12 +120,12 @@ func (r *Rsa) Verify(plaintext, sign string) error {
 }
 
 func NewRsa(opts ...RsaOption) *Rsa {
-	var options *RsaOptions
+	var options RsaOptions
 	for _, opt := range opts {
-		opt(options)
+		opt(&options)
 	}
 	rsaCrypt := &Rsa{
-		options: options,
+		options: &options,
 	}
 	if err := rsaCrypt.Init(); err != nil {
 		logger.Errorf("init rsa crypt failed: %s", err.Error())
