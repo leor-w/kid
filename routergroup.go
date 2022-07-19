@@ -14,7 +14,6 @@ type HandleFunc func(*Context) interface{}
 type Middleware func(*Context)
 
 func (group *RouterGroup) POST(path string, handler HandleFunc, middlewares ...Middleware) {
-
 	group.RouterGroup.POST(path, convert(handler, middlewares...)...)
 }
 

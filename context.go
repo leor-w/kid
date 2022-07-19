@@ -71,7 +71,7 @@ func (ctx *Context) find(key string) string {
 	if len(val) > 0 {
 		return val
 	}
-	val = ctx.FindString(key)
+	val = ctx.GetString(key)
 	if len(val) > 0 {
 		return val
 	}
