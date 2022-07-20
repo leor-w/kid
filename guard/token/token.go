@@ -2,7 +2,6 @@ package token
 
 import (
 	"fmt"
-	"github.com/leor-w/kid"
 	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/guard"
 	"github.com/leor-w/kid/utils/signature"
@@ -35,24 +34,34 @@ type tokenInfo struct {
 }
 
 func (guard *Token) License(user *guard.User) (string, error) {
-	tokenInfo := &tokenInfo{
-		User:     user,
-		ExpireAt: time.Now().Add(time.Duration(guard.options.expire) * time.Hour).Unix(),
-		IssuerAt: time.Now().Unix(),
+	var (
+		info     *tokenInfo
+		tokenStr string
+	)
+	for {
+		info = &tokenInfo{
+			User:     user,
+			ExpireAt: time.Now().Add(guard.options.expire).Unix(),
+			IssuerAt: time.Now().Unix(),
+		}
+		data, err := signature.EncodeToURLBase64(info)
+		if err != nil {
+			return "", err
+		}
+		tokenStr, err = signature.SignHMACHS384.Sign(data, guard.options.secret)
+		if err != nil {
+			return "", err
+		}
+		info.Token = tokenStr
+		if guard.Store.Exist(tokenStr) {
+			continue
+		}
+		break
 	}
-	data, err := signature.EncodeToURLBase64(tokenInfo)
-	if err != nil {
+	if err := guard.Store.Save(tokenStr, info); err != nil {
 		return "", err
 	}
-	token, err := signature.SignHMACHS384.Sign(data, guard.options.secret)
-	if err != nil {
-		return "", err
-	}
-	tokenInfo.Token = token
-	if err := guard.Store.Save(token, tokenInfo); err != nil {
-		return "", err
-	}
-	return token, nil
+	return tokenStr, nil
 }
 
 func (guard *Token) Verify(license string) (*guard.User, error) {
@@ -100,11 +109,4 @@ var token *Token
 
 func Default() *Token {
 	return token
-}
-
-func Tokens() kid.Middleware {
-	return func(ctx *kid.Context) {
-		ctx.Guard = token
-		ctx.Next()
-	}
 }

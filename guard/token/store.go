@@ -13,6 +13,7 @@ type Store interface {
 	Get(license string) (*tokenInfo, error)
 	Save(license string, user *tokenInfo) error
 	Expired(license string) error
+	Exist(token string) bool
 }
 
 type RedisStore struct {
@@ -67,6 +68,11 @@ func (rs *RedisStore) Get(token string) (*tokenInfo, error) {
 }
 
 func (rs *RedisStore) Save(token string, session *tokenInfo) error {
+
+	if err := rs.removeOldToken(session.Id); err != nil {
+		return err
+	}
+
 	valBytes, err := json.Marshal(session)
 	if err != nil {
 		return err
@@ -79,5 +85,44 @@ func (rs *RedisStore) Save(token string, session *tokenInfo) error {
 }
 
 func (rs *RedisStore) Expired(license string) error {
+	info, err := rs.Get(license)
+	if err != nil {
+		return err
+	}
+	if err = rs.rdb.Expire(GetTokenIdKey(info.Id), 0).Err(); err != nil {
+		return err
+	}
 	return rs.rdb.Expire(GetTokenKey(license), 0).Err()
+}
+
+func (rs *RedisStore) removeOldToken(tokenUid int64) error {
+	exist, err := rs.rdb.Exists(GetTokenIdKey(tokenUid)).Result()
+	if err != nil {
+		return err
+	}
+	if exist <= 0 {
+		return nil
+	}
+	oldToken, err := rs.rdb.Get(GetTokenIdKey(tokenUid)).Result()
+	if err != nil {
+		return err
+	}
+	if err = rs.rdb.Expire(GetTokenKey(oldToken), 0).Err(); err != nil {
+		return err
+	}
+	if err = rs.rdb.Expire(GetTokenIdKey(tokenUid), 0).Err(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (rs *RedisStore) Exist(token string) bool {
+	exist, err := rs.rdb.Exists(GetTokenKey(token)).Result()
+	if err != nil {
+		return true
+	}
+	if exist > 0 {
+		return true
+	}
+	return false
 }
