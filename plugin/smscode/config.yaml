@@ -1,0 +1,6 @@
+aliyun:
+  accessKeyId: ""
+  accessKeySecret: ""
+  endpoint: ""
+  signName: ""
+  tempCode: ""
