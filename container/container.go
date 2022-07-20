@@ -3,6 +3,7 @@ package container
 import (
 	"errors"
 	"fmt"
+	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/utils"
 	"reflect"
 	"sync/atomic"
@@ -15,6 +16,7 @@ type Container interface {
 	Provider
 	Populater
 	Invoker
+	Get(plugin plugin.Plugin, name ...string) (interface{}, error)
 }
 
 type Provider interface {
@@ -125,7 +127,7 @@ func (c *container) populate(e *entity) error {
 			continue
 		}
 		ft := f.Type()
-		fe, err := c.Get(ft, tag)
+		fe, err := c.get(ft, tag)
 		if err != nil {
 			return err
 		}
@@ -155,7 +157,19 @@ func (c *container) Invoke(fn interface{}) ([]reflect.Value, error) {
 	return nil, nil
 }
 
-func (c *container) Get(t reflect.Type, name string) (*entity, error) {
+func (c *container) Get(plugin plugin.Plugin, names ...string) (interface{}, error) {
+	var name string
+	if len(names) > 0 {
+		name = names[0]
+	}
+	entity, err := c.get(reflect.TypeOf(plugin), name)
+	if err != nil {
+		return nil, err
+	}
+	return entity.instance, nil
+}
+
+func (c *container) get(t reflect.Type, name string) (*entity, error) {
 	b, exist := c.buckets[t]
 	if !exist {
 		//ct := utils.ConvertPointer(t)

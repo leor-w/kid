@@ -34,6 +34,10 @@ func (kid *Kid) Registry(plugin plugin.Plugin, opts ...container.Option) *Kid {
 	return kid
 }
 
+func (kid *Kid) Get(plugin plugin.Plugin, name ...string) (interface{}, error) {
+	return kid.iocContainer.Get(plugin, name...)
+}
+
 func (kid *Kid) loadConfig() error {
 	_ = config.New(
 		config.WithProviders(kid.Options.Configs),

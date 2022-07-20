@@ -13,7 +13,7 @@ type HMAC struct {
 }
 
 func (h *HMAC) Verify(verify, signed string, key []byte) error {
-	sig, err := base64.URLEncoding.DecodeString(signed)
+	sig, err := base64.StdEncoding.DecodeString(signed)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func (h *HMAC) Sign(signingString string, key []byte) (string, error) {
 	}
 	hasher := hmac.New(h.Hash.New, key)
 	hasher.Write([]byte(signingString))
-	return base64.URLEncoding.EncodeToString(hasher.Sum(nil)), nil
+	return base64.StdEncoding.EncodeToString(hasher.Sum(nil)), nil
 }
 
 func (h *HMAC) Name() string {
