@@ -44,7 +44,9 @@ func New(opts ...Option) *Conn {
 		conn.options.Host,
 		conn.options.Port,
 		conn.options.Db)
-	db, err := gorm.Open(mysql.Open(dns), &gorm.Config{Logger: NewKidLogger(&logger.Config{})})
+	db, err := gorm.Open(mysql.Open(dns), &gorm.Config{Logger: NewKidLogger(&logger.Config{
+		SlowThreshold: 200 * time.Millisecond,
+	})})
 	if err != nil {
 		panic(fmt.Sprintf("connect mysql failed: %s", err.Error()))
 	}
@@ -76,5 +78,6 @@ func Default() *Conn {
 		WithMaxLife(config.GetDuration("mysql.maxLife")),
 		WithMaxIdle(config.GetInt("mysql.maxIdle")),
 		WithMaxOpen(config.GetInt("mysql.maxOpen")),
+		WithLogLevel(config.GetInt("mysql.logLevel")),
 	)
 }
