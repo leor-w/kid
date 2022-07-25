@@ -3,7 +3,6 @@ package ginmiddleware
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/leor-w/kid/logger"
 )
 
 func Logger() func(ctx *gin.Context) {
@@ -18,7 +17,6 @@ func Logger() func(ctx *gin.Context) {
 			params.Request.UserAgent(),
 			params.ErrorMessage,
 		)
-		logger.Info(log)
 		return log
 	})
 }
