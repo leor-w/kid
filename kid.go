@@ -6,6 +6,7 @@ import (
 	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/container"
 	"github.com/leor-w/kid/logger"
+	"github.com/leor-w/kid/middleware/ginmiddleware"
 	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/plugin/logrus"
 )
@@ -93,5 +94,7 @@ func New(opts ...Option) *Kid {
 	if err := kid.loadLogger(); err != nil {
 		panic(err.Error())
 	}
+	engine.Use(ginmiddleware.Logger())
+	engine.Use(ginmiddleware.Recovery)
 	return kid
 }
