@@ -39,6 +39,25 @@ func (kid *Kid) Get(plugin plugin.Plugin, name ...string) (interface{}, error) {
 	return kid.iocContainer.Get(plugin, name...)
 }
 
+func (kid *Kid) Init() error {
+	if err := kid.loadConfig(); err != nil {
+		return err
+	}
+	if err := kid.loadLogger(); err != nil {
+		return err
+	}
+	runMode := config.GetString(kid.Options.RunMode)
+	if len(runMode) == 0 {
+		runMode = gin.TestMode
+	}
+	gin.SetMode(runMode)
+	kid.Engine = gin.New()
+	kid.Engine.Use(ginmiddleware.Logger())
+	kid.Engine.Use(ginmiddleware.Recovery)
+	kid.RouterGroup = RouterGroup{&(kid.Engine.RouterGroup)}
+	return nil
+}
+
 func (kid *Kid) loadConfig() error {
 	_ = config.New(
 		config.WithProviders(kid.Options.Configs),
@@ -81,20 +100,12 @@ func New(opts ...Option) *Kid {
 	for _, o := range opts {
 		o(opt)
 	}
-	engine := gin.New()
 	kid := &Kid{
-		Engine:       engine,
-		RouterGroup:  RouterGroup{&(engine.RouterGroup)},
 		iocContainer: container.New(),
 		Options:      opt,
 	}
-	if err := kid.loadConfig(); err != nil {
+	if err := kid.Init(); err != nil {
 		panic(err.Error())
 	}
-	if err := kid.loadLogger(); err != nil {
-		panic(err.Error())
-	}
-	engine.Use(ginmiddleware.Logger())
-	engine.Use(ginmiddleware.Recovery)
 	return kid
 }
