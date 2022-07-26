@@ -1,14 +1,31 @@
 package kid
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
 	"github.com/leor-w/kid/guard"
+	"github.com/leor-w/kid/utils"
 	"github.com/spf13/cast"
 )
 
 type Context struct {
 	*gin.Context
 	Guard guard.Guard
+}
+
+func (ctx *Context) GetValue(key string, recipient interface{}) error {
+	val, exist := ctx.Get(key)
+	if !exist {
+		return fmt.Errorf("[%s] value not exist", key)
+	}
+	if utils.IsNilPointer(recipient) {
+		return fmt.Errorf("recipient cannot is nil pointer")
+	}
+	if err := copier.Copy(recipient, val); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ctx *Context) Valid(recipient interface{}) error {
