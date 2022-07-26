@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/database/redis"
+	"github.com/leor-w/kid/guard"
 	"time"
 )
 
@@ -45,40 +46,38 @@ func (rs *RedisStore) Get(token string) (*tokenInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	var sessionInfo tokenInfo
-	err = json.Unmarshal([]byte(val), &sessionInfo)
+	var info tokenInfo
+	err = json.Unmarshal([]byte(val), &info)
 	if err != nil {
 		return nil, err
 	}
-	exist, err = rs.rdb.Exists(GetTokenIdKey(sessionInfo.Id)).Result()
+	exist, err = rs.rdb.Exists(GetTokenIdKey(info.Type, info.Id)).Result()
 	if err != nil {
 		return nil, err
 	}
 	if exist <= 0 {
 		return nil, errors.New("token bind user not exist")
 	}
-	redisToken, err := rs.rdb.Get(GetTokenIdKey(sessionInfo.Id)).Result()
+	redisToken, err := rs.rdb.Get(GetTokenIdKey(info.Type, info.Id)).Result()
 	if err != nil {
 		return nil, err
 	}
 	if redisToken != token {
 		return nil, errors.New("request token invalid")
 	}
-	return &sessionInfo, nil
+	return &info, nil
 }
 
 func (rs *RedisStore) Save(token string, session *tokenInfo) error {
-
-	if err := rs.removeOldToken(session.Id); err != nil {
+	if err := rs.removeOldToken(session.Type, session.Id); err != nil {
 		return err
 	}
-
 	valBytes, err := json.Marshal(session)
 	if err != nil {
 		return err
 	}
 	expired := time.Duration(session.ExpireAt-time.Now().Unix()) * time.Second
-	if err = rs.rdb.Set(GetTokenIdKey(session.Id), session.Token, expired).Err(); err != nil {
+	if err = rs.rdb.Set(GetTokenIdKey(session.Type, session.Id), session.Token, expired).Err(); err != nil {
 		return err
 	}
 	return rs.rdb.Set(GetTokenKey(token), string(valBytes), expired).Err()
@@ -89,28 +88,28 @@ func (rs *RedisStore) Expired(license string) error {
 	if err != nil {
 		return err
 	}
-	if err = rs.rdb.Expire(GetTokenIdKey(info.Id), 0).Err(); err != nil {
+	if err = rs.rdb.Expire(GetTokenIdKey(info.Type, info.Id), 0).Err(); err != nil {
 		return err
 	}
 	return rs.rdb.Expire(GetTokenKey(license), 0).Err()
 }
 
-func (rs *RedisStore) removeOldToken(tokenUid int64) error {
-	exist, err := rs.rdb.Exists(GetTokenIdKey(tokenUid)).Result()
+func (rs *RedisStore) removeOldToken(userType guard.UserType, tokenUid int64) error {
+	exist, err := rs.rdb.Exists(GetTokenIdKey(userType, tokenUid)).Result()
 	if err != nil {
 		return err
 	}
 	if exist <= 0 {
 		return nil
 	}
-	oldToken, err := rs.rdb.Get(GetTokenIdKey(tokenUid)).Result()
+	oldToken, err := rs.rdb.Get(GetTokenIdKey(userType, tokenUid)).Result()
 	if err != nil {
 		return err
 	}
 	if err = rs.rdb.Expire(GetTokenKey(oldToken), 0).Err(); err != nil {
 		return err
 	}
-	if err = rs.rdb.Expire(GetTokenIdKey(tokenUid), 0).Err(); err != nil {
+	if err = rs.rdb.Expire(GetTokenIdKey(userType, tokenUid), 0).Err(); err != nil {
 		return err
 	}
 	return nil

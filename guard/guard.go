@@ -2,9 +2,16 @@ package guard
 
 import "time"
 
+type UserType int
+
+const (
+	Admin UserType = iota + 1
+	GeneralUser
+)
+
 type User struct {
-	Id   int64 `json:"id"`
-	Type int8  `json:"type"`
+	Id   int64    `json:"id"`
+	Type UserType `json:"type"`
 }
 
 // Guard API 入口守卫

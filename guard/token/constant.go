@@ -1,16 +1,19 @@
 package token
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/leor-w/kid/guard"
+)
 
 const (
 	Key   = "auth.token.%s"
-	IDKey = "auth.id.%d"
+	IDKey = "auth.%d.%d" // auth.type.id
 )
 
 func GetTokenKey(session string) string {
 	return fmt.Sprintf(Key, session)
 }
 
-func GetTokenIdKey(id int64) string {
-	return fmt.Sprintf(IDKey, id)
+func GetTokenIdKey(userType guard.UserType, id int64) string {
+	return fmt.Sprintf(IDKey, userType, id)
 }

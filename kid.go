@@ -84,6 +84,7 @@ func (kid *Kid) Launch(hosts ...string) {
 	if err := kid.iocContainer.Populate(); err != nil {
 		panic(fmt.Sprintf("kid.Launch: failed: %s", err.Error()))
 	}
+	logger.Infof("Listener and serving HTTP on: %s", host)
 	_ = kid.Run(host)
 }
 
