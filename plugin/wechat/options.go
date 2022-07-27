@@ -1,8 +1,8 @@
 package wechat
 
 type Options struct {
-	*MiniProgram
-	*Pay
+	MiniProgram
+	Pay
 	appid string
 }
 
