@@ -11,12 +11,12 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type Conn struct {
+type DB struct {
 	*gorm.DB
 	options *Options
 }
 
-func (conn *Conn) Provide() interface{} {
+func (conn *DB) Provide() interface{} {
 	if !config.Exist("mysql") {
 		panic("not found [mysql] in config")
 	}
@@ -25,7 +25,7 @@ func (conn *Conn) Provide() interface{} {
 
 type Option func(*Options)
 
-func New(opts ...Option) *Conn {
+func New(opts ...Option) *DB {
 	options := Options{
 		Port:    3306,
 		MaxIdle: 20,
@@ -35,7 +35,7 @@ func New(opts ...Option) *Conn {
 	for _, opt := range opts {
 		opt(&options)
 	}
-	conn := &Conn{
+	conn := &DB{
 		options: &options,
 	}
 	dns := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
@@ -68,7 +68,7 @@ func New(opts ...Option) *Conn {
 	return conn
 }
 
-func Default() *Conn {
+func Default() *DB {
 	return New(
 		WithHost(config.GetString("mysql.host")),
 		WithPort(config.GetInt("mysql.port")),
@@ -80,4 +80,26 @@ func Default() *Conn {
 		WithMaxOpen(config.GetInt("mysql.maxOpen")),
 		WithLogLevel(config.GetInt("mysql.logLevel")),
 	)
+}
+
+func Paginate(pageNum, pageSize int) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if pageNum <= 0 {
+			pageNum = 1
+		}
+		if pageSize <= 0 {
+			pageSize = 10
+		}
+		if pageSize >= 100 {
+			pageSize = 100
+		}
+		offset := (pageNum - 1) * pageSize
+		return db.Offset(offset).Limit(pageSize)
+	}
+}
+
+func FilterDeleted() func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("deleted = 0")
+	}
 }

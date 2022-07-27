@@ -4,4 +4,4 @@ qiniu:
   access: kid_assess_key
   secret: kid_secret_key
   private: false
-  ttl: 5 # second
+  ttl: 5
