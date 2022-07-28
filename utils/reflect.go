@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"reflect"
 )
 
@@ -33,4 +34,30 @@ func RemoveValuePtr(v reflect.Value) reflect.Value {
 		v = v.Elem()
 	}
 	return v
+}
+
+// StructToMap 将一个结构体转换为
+func StructToMap(in interface{}, omits ...string) (map[string]interface{}, error) {
+	var out = make(map[string]interface{})
+	v := reflect.ValueOf(in)
+	for v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("in value must be struct or struct pointer : %T", v)
+	}
+
+	t := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		f := t.Field(i)
+		if ContainString(omits, f.Name) {
+			continue
+		}
+		fv := v.Field(i)
+		if !fv.CanInterface() {
+			continue
+		}
+		out[f.Name] = fv.Interface()
+	}
+	return out, nil
 }

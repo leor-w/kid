@@ -42,8 +42,8 @@ func (w *Wechat) SetCache(cache cache.Cache) {
 func (w *Wechat) MiniProgram() *miniprogram.MiniProgram {
 	if w.miniProgram == nil {
 		w.miniProgram = w.wechat.GetMiniProgram(&miniConf.Config{
-			AppID:     config.GetString("wechat.mini.appid"),
-			AppSecret: config.GetString("wechat.mini.secret"),
+			AppID:     w.options.appid,
+			AppSecret: w.options.secret,
 			Cache:     w.cache,
 		})
 	}
@@ -53,10 +53,10 @@ func (w *Wechat) MiniProgram() *miniprogram.MiniProgram {
 func (w *Wechat) GetPay() *pay.Pay {
 	if w.pay == nil {
 		w.pay = w.wechat.GetPay(&payConf.Config{
-			AppID:     config.GetString("wechat.pay.appid"),
-			MchID:     config.GetString("wechat.pay.mchid"),
-			Key:       config.GetString("wechat.pay.key"),
-			NotifyURL: config.GetString("wechat.pay.notifyUrl"),
+			AppID:     w.options.appid,
+			MchID:     w.options.mchid,
+			Key:       w.options.key,
+			NotifyURL: w.options.notifyUrl,
 		})
 	}
 	return w.pay
