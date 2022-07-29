@@ -50,6 +50,13 @@ func StructToMap(in interface{}, omits ...string) (map[string]interface{}, error
 	t := v.Type()
 	for i := 0; i < v.NumField(); i++ {
 		f := t.Field(i)
+		if f.Anonymous {
+			fv := v.Field(i)
+			if !fv.CanInterface() {
+				continue
+			}
+			return StructToMap(fv.Interface(), omits...)
+		}
 		if ContainString(omits, CamelToSnake(f.Name)) {
 			continue
 		}

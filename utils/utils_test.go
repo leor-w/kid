@@ -13,13 +13,19 @@ type Name struct {
 	e  string
 }
 
+type V struct {
+	Name
+}
+
 func TestStructToMap(t *testing.T) {
-	n := &Name{
-		AB: "leor",
-		B:  8,
-		C:  3,
-		D:  true,
-		e:  "1112",
+	n := &V{
+		Name{
+			AB: "leor",
+			B:  8,
+			C:  3,
+			D:  true,
+			e:  "1112",
+		},
 	}
 	m, err := StructToMap(n)
 	if err != nil {
