@@ -98,6 +98,18 @@ func Paginate(pageNum, pageSize int) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
+func Where(where map[string]interface{}) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if len(where) <= 0 {
+			return db
+		}
+		for k, v := range where {
+			db.Where(fmt.Sprintf("%s = ?", k), v)
+		}
+		return db
+	}
+}
+
 func FilterDeleted() func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("deleted = 0")
