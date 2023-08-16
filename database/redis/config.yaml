@@ -1,0 +1,27 @@
+redis:
+  addr: http://127.0.0.1:6379
+  db: 0
+  password: secret
+  dialTimeout: 3 # second
+  readTimeout: 3 # second
+  writeTimeout: 3 # second
+  maxConnAge: 8 # hour
+  poolTimeout: 3 # second
+  idleTimeout: 3 # minute
+  poolSize: 50
+  minIdleConn: 10
+  ctxTimeout: 3 # second
+
+redisCluster:
+  addrs: ["http://127.0.0.1:6379", "http://127.0.0.1:6380", "http:127.0.0.1:6381"] # 连接地址
+  usename: # 用户名
+  password: # 密码
+  dialTimeout: 3 # second
+  readTimeout: 3 # second
+  writeTimeout: 3 # second
+  maxConnAge: 8 # second
+  poolTimeout: 3 # second
+  idleTimeout: 3 # minute
+  poolSize: 50 # 连接池最大链接数
+  minIdleConn: 10 # 最小空闲链接数
+  ctxTimeout: 3 # second

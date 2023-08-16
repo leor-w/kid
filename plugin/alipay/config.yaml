@@ -1,0 +1,10 @@
+alipay:
+  appId: appid
+  privateKey: privateKey
+  appPublicCert: appPublicCert
+  appPublicCertFile: appPublicCertFile
+  aliRootCert: aliRootCert
+  aliRootCertFile: aliRootCertFile
+  aliPublicCert: aliPublicCert
+  aliPublicCertFile: aliPublicCertFile
+  isProduct: false

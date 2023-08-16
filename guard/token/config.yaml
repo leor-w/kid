@@ -1,0 +1,3 @@
+token:
+  expire: 1 # 过期时间 day
+  store: redis

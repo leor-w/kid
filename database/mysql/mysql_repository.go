@@ -1,0 +1,238 @@
+package mysql
+
+import (
+	"context"
+	"errors"
+
+	"github.com/leor-w/kid/database/repos"
+	"github.com/leor-w/kid/database/repos/creator"
+	"github.com/leor-w/kid/database/repos/deleter"
+	"github.com/leor-w/kid/database/repos/finder"
+	"github.com/leor-w/kid/database/repos/updater"
+	"github.com/leor-w/kid/logger"
+	"github.com/leor-w/kid/utils"
+	"gorm.io/gorm"
+)
+
+var (
+	MissingUpdates = errors.New("更新内容为空")
+)
+
+type Repository struct {
+	DB *MySQL `inject:""`
+}
+
+func (repo *Repository) Provide(context.Context) interface{} {
+	return repo
+}
+
+func (repo *Repository) handleErr(ignoreErr bool, err error) error {
+	if ignoreErr && errors.Is(err, gorm.ErrRecordNotFound) {
+		logger.Debug("record not found")
+		return nil
+	} else {
+		return err
+	}
+}
+
+func (repo *Repository) Transaction(txFunc func(context.Context) error) error {
+	tx := repo.DB.Begin()
+	ctx := context.WithValue(context.Background(), repos.TxKey{}, tx)
+	err := txFunc(ctx)
+	if err != nil {
+		if err := tx.Rollback().Error; err != nil {
+			return err
+		}
+		return err
+	}
+	if err := tx.Commit().Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *Repository) GetDb(ctx context.Context) interface{} {
+	return repo.getTx(ctx)
+}
+
+func (repo *Repository) WhetherTx(tx context.Context) bool {
+	return repo.getTx(tx) != nil
+}
+
+func (repo *Repository) ExecWithTx(tx context.Context, fn func(tx context.Context) error) error {
+	if repo.WhetherTx(tx) {
+		return fn(tx)
+	}
+	return repo.Transaction(func(tx context.Context) error {
+		return fn(tx)
+	})
+}
+
+func (repo *Repository) getTx(tx context.Context) *gorm.DB {
+	if tx == nil {
+		return repo.DB.DB
+	}
+	txDb, ok := tx.Value(repos.TxKey{}).(*gorm.DB)
+	if !ok {
+		return repo.DB.DB
+	}
+	return txDb
+}
+
+func (repo *Repository) Exist(finder *finder.Finder) bool {
+	var count int64
+	if err := repo.DB.
+		Model(finder.Model).
+		Scopes(Wheres(finder.Wheres)).
+		Count(&count).
+		Error; err != nil {
+		logger.Errorf("mysql_repository.go Exist error: %v", err.Error())
+		return false
+	}
+	if count <= 0 {
+		return false
+	}
+	return true
+}
+
+func (repo *Repository) GetOne(finder *finder.Finder) error {
+	db := repo.DB.Scopes(Wheres(finder.Wheres))
+	if len(finder.Preloads) > 0 {
+		for _, preload := range finder.Preloads {
+			db.Preload(preload)
+		}
+	}
+	if len(finder.Scopes) > 0 {
+		db.Scopes(finder.Scopes...)
+	}
+	if finder.Unscoped {
+		db.Unscoped()
+	}
+	if err := db.First(finder.Recipient).Error; err != nil {
+		return repo.handleErr(finder.IgnoreNotFound, err)
+	}
+	return nil
+}
+
+func (repo *Repository) Find(finder *finder.Finder) error {
+	db := repo.DB.Scopes(Wheres(finder.Wheres))
+	if finder.Model != nil {
+		db.Model(finder.Model)
+	}
+	if finder.OrderBy != "" {
+		db.Order(finder.OrderBy)
+	}
+	if len(finder.Preloads) > 0 {
+		for _, preload := range finder.Preloads {
+			db.Preload(preload)
+		}
+	}
+	if len(finder.Scopes) > 0 {
+		db.Scopes(finder.Scopes...)
+	}
+	if finder.Unscoped {
+		db.Unscoped()
+	}
+	if finder.Total != nil {
+		if err := db.Count(finder.Total).Error; err != nil {
+			return repo.handleErr(finder.IgnoreNotFound, err)
+		}
+	}
+	if finder.Size > 0 {
+		db.Scopes(Paginate(finder.Num, finder.Size))
+	}
+	if err := db.Find(finder.Recipient).Error; err != nil {
+		return repo.handleErr(finder.IgnoreNotFound, err)
+	}
+	return nil
+}
+
+func (repo *Repository) Create(creator *creator.Creator) error {
+	return repo.
+		getTx(creator.Tx).
+		Create(creator.Data).
+		Error
+}
+
+func (repo *Repository) Save(creator *creator.Creator) error {
+	return repo.getTx(creator.Tx).Save(creator.Data).Error
+}
+
+func (repo *Repository) Update(updater *updater.Updater) error {
+	db := repo.getTx(updater.Tx).Scopes(Wheres(updater.Wheres))
+	if len(updater.Omits) > 0 {
+		db.Omit(updater.Omits...)
+	}
+	if updater.SaveNil && updater.Update != nil {
+		db = db.Select("*")
+	}
+	if updater.Update != nil {
+		return db.
+			Updates(updater.Update).
+			Error
+	}
+	if updater.Fields != nil {
+		return db.Model(updater.Model).
+			UpdateColumns(updater.Fields).
+			Error
+	}
+	return MissingUpdates
+}
+
+func (repo *Repository) Delete(deleter *deleter.Deleter) error {
+	return repo.getTx(deleter.Tx).
+		Model(deleter.Model).
+		Scopes(Wheres(deleter.Wheres)).
+		Delete(nil).
+		Error
+}
+
+func (repo *Repository) Exec(tx context.Context, sql string, args ...interface{}) error {
+	return repo.getTx(tx).Exec(sql, args...).Error
+}
+
+func (repo *Repository) Raw(tx context.Context, sql string, args ...interface{}) error {
+	return repo.getTx(tx).Raw(sql, args...).Error
+}
+
+func (repo *Repository) GetUniqueID(finder *finder.Finder, min, max, ignoreStart, ignoreEnd int64) int64 {
+	var uniqueId int64
+	for {
+		id := utils.UniqueId(min, max)
+		if ignoreStart > 0 && ignoreEnd > 0 && uniqueId >= ignoreStart && uniqueId <= ignoreEnd {
+			continue
+		}
+		finder.Wheres[0].V1 = id
+		if repo.Exist(finder) {
+			continue
+		}
+		uniqueId = id
+		break
+	}
+	return uniqueId
+}
+
+func (repo *Repository) Count(finder *finder.Finder) error {
+	if err := repo.DB.
+		Model(finder.Model).
+		Scopes(Wheres(finder.Wheres)).
+		Count(finder.Total).
+		Error; err != nil {
+		return repo.handleErr(finder.IgnoreNotFound, err)
+	}
+	return nil
+}
+
+// Sum 查询某个字段的和
+func (repo *Repository) Sum(sum *finder.Sum) error {
+	if err := repo.DB.
+		Model(sum.Model).
+		Scopes(
+			Wheres(sum.Wheres),
+			Sum(sum.Col, sum.Val),
+		).
+		Error; err != nil {
+		return err
+	}
+	return nil
+}

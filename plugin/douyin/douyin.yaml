@@ -1,0 +1,17 @@
+douyin:
+  app:
+    clientKey: # 抖音key
+    clientSecret: # 抖音秘钥
+  miniProgram:
+    clientKey:
+    clientSecret:
+  pay:
+    appId: appid
+    token: tokentokentoken
+    salt: slatsaltsalt
+    thirdpartyId: abcdefg
+    storeUid: abcdefg
+    notifyUrl: https://xxx.com/douyin/pay/callback
+    disableMsg: 0
+    msgPage: /index/page/success
+    isProduct: false

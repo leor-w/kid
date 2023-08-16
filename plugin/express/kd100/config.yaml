@@ -1,0 +1,9 @@
+express:
+  kd100:
+    key: key
+    customer: customer
+    secret: secret
+    baseUrl: https://poll.kuaidi100.com
+    salt: salt
+    notifyUrl: https://callbackdomain.com/api/v1/express/kd100/callback
+    sendExpressUrl: https://callbackdomain.com/api/v1/express/kd100/send/express/callback

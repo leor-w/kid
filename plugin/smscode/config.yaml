@@ -1,0 +1,43 @@
+# 单个短信发送方式
+aliyun:
+  accessKeyId: ""
+  accessKeySecret: ""
+  endpoint: ""
+  signName: ""
+  tempCode: ""
+  templates: # 自定义签名及模版
+    smsCode:
+      signName: ""
+      tempCode: ""
+    notify:
+      signName: ""
+      tempCode: ""
+
+# 多个短信发送方式配置
+aliyun:
+  sms1:
+    accessKeyId: ""
+    accessKeySecret: ""
+    endpoint: ""
+    signName: ""
+    tempCode: ""
+    templates: # 自定义签名及模版
+      smsCode:
+        signName: ""
+        tempCode: ""
+      notify:
+        signName: ""
+        tempCode: ""
+  sms2:
+    accessKeyId: ""
+    accessKeySecret: ""
+    endpoint: ""
+    signName: ""
+    tempCode: ""
+    templates: # 自定义签名及模版
+      smsCode:
+        signName: ""
+        tempCode: ""
+      notify:
+        signName: ""
+        tempCode: ""

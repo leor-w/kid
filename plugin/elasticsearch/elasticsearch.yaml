@@ -1,0 +1,28 @@
+elasticsearch:
+  addresses: # 地址列表
+    - "host-1"
+    - "host-2"
+  username: user # 连接用户
+  password: password # 连接密码
+  cloudID: cloudId # elastic cloudId
+  apiKey: apikey # 用于授权的 base64 编码, 如果设置则覆盖用户名/密码及服务 token
+  serviceToken: token # 服务 token
+  certificateFingerprint: cert # elasticsearch 首次启动时提供的 sha256 十六进制指纹
+  header: # 设置全局的请求头信息
+    key:
+      - val
+      - val2
+  caCert: caCert # ca 证书发布
+  retryOnStatus: # 重试状态
+    - 502
+    - 503
+    - 504
+  disableRetry: false
+  maxRetries: 3 # 最大重试次数
+  compressRequestBody: false
+  discoverNodesOnStart: false
+  discoverNodesInterval: 3
+  enableMetrics: false
+  enableDebugLogger: false
+  enableCompatibilityMode: false
+  disableMetaHeader: false

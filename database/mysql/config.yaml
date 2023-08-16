@@ -1,0 +1,10 @@
+mysql:
+  host: "" # 数据库连接地址
+  port: 0 # 数据库连接端口
+  user: "" # 连接用户名
+  password: "" # 密码
+  database: "" # 数据库名
+  maxLife: 0 # 数据库连接最长有效时间
+  maxIdle: 0 # 数据库最大空闲连接数
+  maxOpen: 0 # 数据库最大开启的连接数
+  logLevel: 3

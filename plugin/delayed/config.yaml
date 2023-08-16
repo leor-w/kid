@@ -1,0 +1,7 @@
+delayed:
+  redisPrefix:  # 当缓存使用的是集群模式时需要设置该值
+  consumer:
+    sleep: 3
+    closeWait: 5
+    maxRetires: 5
+    workerNum: 20

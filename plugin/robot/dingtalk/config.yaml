@@ -1,0 +1,15 @@
+dingtalk:
+  dingtalk:
+    robots:
+      - name: ""
+        robot_code: ""
+        conversation_id: ""
+        token: ""
+        cool_app_code: ""
+  webhook:
+    robots:
+      - name: "测试机器人"
+        webhook: ""
+        sign_secret: ""
+        security: true # keyword sign
+        conn_timeout: 3

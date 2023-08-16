@@ -1,0 +1,5 @@
+websocket:
+  handshakeTimeout: 5 # second
+  readBufferSize: 1024
+  writeBufferSize: 1024
+  enableCompression: false

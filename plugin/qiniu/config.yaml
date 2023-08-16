@@ -1,0 +1,17 @@
+qiniu:
+  domain: https://qiniu.com
+  bucket: kid
+  access: kid_assess_key
+  secret: kid_secret_key
+  private: false
+  ttl: 5
+  bucketConf:
+    useHttps: true
+    useDomains: true
+    centralRsHost:
+  operation:
+    useHttps: true
+    useDomains: true
+    centralRsHost:
+    notifyUrl:
+    pipeline:

@@ -1,0 +1,18 @@
+wechat:
+  appid: appid
+  mini:
+    appId:
+    secret: secret
+  pay:
+    appId:
+    mchid: mchid
+    privateKey: privateKey
+    privateKeyFile: privateKeyFile
+    certSerialNum: certSerialNum
+    key: key
+    payNotifyUrl: payNotifyUrl
+    refundNotifyUrl: refundNotifyUrl
+  official:
+    appId:
+    token: token
+    encodingAESKey: aeskey

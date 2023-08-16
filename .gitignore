@@ -1,0 +1,16 @@
+.idea
+logs/
+.vscode
+.DS_Store
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+*.test
+
+*.out
+*.json
+*.log

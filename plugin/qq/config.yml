@@ -1,0 +1,7 @@
+qq:
+  oauth:
+    appId: "" # 在 qq 互联申请应用时分配的 appId
+    appKey: "" # 在 qq 互联申请应用时分配的 appKey
+    display: "" # pc 网站接入使用, 用于展示样式. 默认为 pc 样式, mobile 为 mobile 样式
+    notify: "" # 回调地址
+    product: false # true = 正式版本 false = 测试版本

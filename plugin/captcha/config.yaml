@@ -1,0 +1,12 @@
+captcha:
+  engine: 1 # 1 数字验证码 2 字符验证码 3 音频验证码 4 语言验证码 5 数学验证码 6 中文验证码
+  width: 80 # 宽
+  height: 240 # 高
+  noiseCount: 20 # 验证码噪点值
+  showSineLine: true # 是否显示空心线
+  showSlimeLine: true # 是否显示粘液线
+  showHollowLine: true # 是否显示正弦线
+  captchaLen: 5 # 验证码长度
+  bgColor: #000000
+  audio:
+    language: en # 验证码语言类型
