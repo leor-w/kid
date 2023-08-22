@@ -3,8 +3,9 @@ package creator
 import "context"
 
 type Creator struct {
-	Tx   context.Context // 事务上下文
-	Data interface{}     // 保存的数据
+	Tx    context.Context // 事务上下文
+	Data  interface{}     // 保存的数据
+	Debug bool            // 是否开启调试模式
 }
 
 func New() *Creator {

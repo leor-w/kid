@@ -80,8 +80,12 @@ func (repo *Repository) getTx(tx context.Context) *gorm.DB {
 }
 
 func (repo *Repository) Exist(finder *finder.Finder) bool {
+	var db = repo.DB
+	if finder.Debug {
+		db.Debug()
+	}
 	var count int64
-	if err := repo.DB.
+	if err := db.
 		Model(finder.Model).
 		Scopes(Wheres(finder.Wheres)).
 		Count(&count).
@@ -97,6 +101,9 @@ func (repo *Repository) Exist(finder *finder.Finder) bool {
 
 func (repo *Repository) GetOne(finder *finder.Finder) error {
 	db := repo.DB.Scopes(Wheres(finder.Wheres))
+	if finder.Debug {
+		db.Debug()
+	}
 	if len(finder.Preloads) > 0 {
 		for _, preload := range finder.Preloads {
 			db.Preload(preload)
@@ -116,6 +123,9 @@ func (repo *Repository) GetOne(finder *finder.Finder) error {
 
 func (repo *Repository) Find(finder *finder.Finder) error {
 	db := repo.DB.Scopes(Wheres(finder.Wheres))
+	if finder.Debug {
+		db.Debug()
+	}
 	if finder.Model != nil {
 		db.Model(finder.Model)
 	}
@@ -148,23 +158,36 @@ func (repo *Repository) Find(finder *finder.Finder) error {
 }
 
 func (repo *Repository) Create(creator *creator.Creator) error {
-	return repo.
-		getTx(creator.Tx).
+	var db = repo.getTx(creator.Tx)
+	if creator.Debug {
+		db.Debug()
+	}
+	return db.
 		Create(creator.Data).
 		Error
 }
 
 func (repo *Repository) Save(creator *creator.Creator) error {
-	return repo.getTx(creator.Tx).Save(creator.Data).Error
+	var db = repo.getTx(creator.Tx)
+	if creator.Debug {
+		db.Debug()
+	}
+	return db.Save(creator.Data).Error
 }
 
 func (repo *Repository) Update(updater *updater.Updater) error {
 	db := repo.getTx(updater.Tx).Scopes(Wheres(updater.Wheres))
+	if updater.Debug {
+		db.Debug()
+	}
 	if len(updater.Omits) > 0 {
 		db.Omit(updater.Omits...)
 	}
-	if updater.SaveNil && updater.Update != nil {
+	if updater.SaveNil && updater.Update != nil && len(updater.Selects) <= 0 {
 		db = db.Select("*")
+	}
+	if len(updater.Selects) > 0 {
+		db = db.Select(updater.Selects)
 	}
 	if updater.Update != nil {
 		return db.
@@ -180,7 +203,11 @@ func (repo *Repository) Update(updater *updater.Updater) error {
 }
 
 func (repo *Repository) Delete(deleter *deleter.Deleter) error {
-	return repo.getTx(deleter.Tx).
+	var db = repo.getTx(deleter.Tx)
+	if deleter.Debug {
+		db.Debug()
+	}
+	return db.
 		Model(deleter.Model).
 		Scopes(Wheres(deleter.Wheres)).
 		Delete(nil).
@@ -213,7 +240,11 @@ func (repo *Repository) GetUniqueID(finder *finder.Finder, min, max, ignoreStart
 }
 
 func (repo *Repository) Count(finder *finder.Finder) error {
-	if err := repo.DB.
+	var db = repo.DB
+	if finder.Debug {
+		db.Debug()
+	}
+	if err := db.
 		Model(finder.Model).
 		Scopes(Wheres(finder.Wheres)).
 		Count(finder.Total).
@@ -225,7 +256,11 @@ func (repo *Repository) Count(finder *finder.Finder) error {
 
 // Sum 查询某个字段的和
 func (repo *Repository) Sum(sum *finder.Sum) error {
-	if err := repo.DB.
+	var db = repo.DB
+	if sum.Debug {
+		db.Debug()
+	}
+	if err := db.
 		Model(sum.Model).
 		Scopes(
 			Wheres(sum.Wheres),

@@ -30,6 +30,9 @@ type Finder struct {
 	// 是否查询软删除的数据, 默认不查询软删除的数据, true: 查询软删除的数据
 	Unscoped bool
 
+	// 是否开启调试模式
+	Debug bool
+
 	// 分页页码, 单页大小
 	Num, Size int
 
@@ -43,6 +46,7 @@ type Sum struct {
 	Wheres where.Wheres
 	Col    string
 	Val    interface{}
+	Debug  bool
 }
 
 func New() *Finder {

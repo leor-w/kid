@@ -538,5 +538,88 @@ type QueryShipmentPriceResp struct {
 
 // --------------------------- C端寄件 ---------------------------
 
+// CShipmentOrderReq 寄件订单创建请求
+type CShipmentOrderReq struct {
+	Kuaidicom        string `json:"kuaidicom"`        // 快递公司编码
+	RecManName       string `json:"recManName"`       // 收件人姓名
+	RecManMobile     string `json:"recManMobile"`     // 收件人手机号
+	RecManPrintAddr  string `json:"recManPrintAddr"`  // 收件人打印地址
+	SendManName      string `json:"sendManName"`      // 寄件人姓名
+	SendManMobile    string `json:"sendManMobile"`    // 寄件人手机号
+	SendManPrintAddr string `json:"sendManPrintAddr"` // 寄件人打印地址
+	CallBackUrl      string `json:"callBackUrl"`      // 回调地址
+	Cargo            string `json:"cargo"`            // 货物名称
+	Payment          string `json:"payment"`          // 代收货款金额
+	Weight           string `json:"weight"`           // 货物重量
+	Remark           string `json:"remark"`           // 备注
+	DayType          string `json:"dayType"`          // 时效类型
+	PickupStartTime  string `json:"pickupStartTime"`  // 上门取件开始时间
+	PickupEndTime    string `json:"pickupEndTime"`    // 上门取件结束时间
+	Salt             string `json:"salt"`             // 签名用随机字符串，用于验证签名sign。salt值不为null时，推送数据将包含该加密签名，加密方式：md5(param+salt)。注意： salt值为空串时，推送的数据也会包含sign，此时可忽略sign的校验。
+	Op               string `json:"op"`               // 是否开启订阅功能 0：不开启(默认) 1：开启 说明开启订阅功能时：pollCallBackUrl必须填入 此功能只针对有快递单号的单
+	PollCallBackUrl  string `json:"pollCallBackUrl"`  // 如果op设置为1时，pollCallBackUrl必须填入，用于跟踪回调，回调内容通过五、快递信息推送接口返回（免费服务）
+	Resultv2         string `json:"resultv2"`         // 添加此字段表示开通行政区域解析功能 。0：关闭（默认）1：开通行政区域解析功能以及物流轨迹增加物流状态名称 (详见：快递信息推送接口文档)3：开通行政区域解析功能以及物流轨迹增加物流状态名称，同时返回地图内容(详见：地图轨迹推送接口文档)
+	ThirdOrderId     string `json:"thirdOrderId"`     // 第三方订单号
+}
+
+// CShipmentOrderResp 寄件订单创建响应
+type CShipmentOrderResp struct {
+	Result     bool   `json:"result"`
+	ReturnCode string `json:"returnCode"`
+	Message    string `json:"message"`
+	Data       struct {
+		TaskId  string `json:"taskId"`
+		OrderId string `json:"orderId "`
+	} `json:"data"`
+}
+
+type CShipmentOrderCallback struct {
+	Kuaidicom string `json:"kuaidicom"` // 快递公司编码
+	Kuaidinum string `json:"kuaidinum"` // 快递单号
+	Status    string `json:"status"`    // 订单状态
+	Message   string `json:"message"`   // 订单状态描述
+	Data      struct {
+		OrderId       string `json:"orderId"`       // 订单号
+		Status        int    `json:"status"`        // 订单状态
+		CourierName   string `json:"courierName"`   // 快递员姓名
+		CourierMobile string `json:"courierMobile"` // 快递员手机号
+		Weight        string `json:"weight"`        // 货物重量
+		DefPrice      string `json:"defPrice"`      // 货物保价金额
+	} `json:"data"` // 接口调用结果数据
+}
+
+// CShipmentOrderCancelReq 寄件订单取消请求
+type CShipmentOrderCancelReq struct {
+	TaskId    string `json:"taskId"`    // 任务ID
+	OrderId   string `json:"orderId"`   // 订单号
+	CancelMsg string `json:"cancelMsg"` // 取消原因
+}
+
+// CShipmentOrderCancelResp 寄件订单取消响应
+type CShipmentOrderCancelResp struct {
+	Result     bool   `json:"result"`
+	ReturnCode string `json:"returnCode"`
+	Message    string `json:"message"`
+}
+
+// CQueryShipmentPriceReq 查询寄件价格请求
+type CQueryShipmentPriceReq struct {
+	Kuaidicom        string `json:"kuaidicom"`
+	ServiceType      string `json:"service_type"`
+	SendManPrintAddr string `json:"sendManPrintAddr"`
+	RecManPrintAddr  string `json:"recManPrintAddr"`
+	Weight           string `json:"weight"`
+}
+
+// CQueryShipmentPriceResp 查询寄件价格响应
+type CQueryShipmentPriceResp struct {
+	Result     bool   `json:"result"`
+	ReturnCode string `json:"returnCode"`
+	Message    string `json:"message"`
+	Data       struct {
+		Price string `json:"price"`
+	} `json:"data"`
+}
+
 // --------------------------- C端寄件 ---------------------------
 // =========================== 寄件 ===========================

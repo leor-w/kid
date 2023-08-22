@@ -14,8 +14,10 @@ type Updater struct {
 	Fields   map[string]interface{} // 修改的map值, 用于修改单个或多个字段时使用
 	SaveNil  bool                   // 是否保存空值, 默认不会更新类似 0,false,"" 等值
 	SaveFull bool                   // 是否同时修改关联数据
+	Debug    bool                   // 是否开启调试模式
 	Preloads []string               // 预加载关联数据
 	Omits    []string               // 修改时指定不更新的字段
+	Selects  []string               // 修改时指定更新的字段
 }
 
 func New() *Updater {
