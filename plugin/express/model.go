@@ -125,7 +125,7 @@ type SendExpressParams struct {
 	ItemName         string              // 物品名称
 	Callback         bool                // 是否回调
 	CallbackUrl      string              // 回调地址
-	PayType          uint8               // 付款方式 1-寄付 2-到付 3-第三方付
+	PayType          PayType             // 付款方式 1-寄付 2-到付 3-第三方付
 	ServiceType      string              // 服务类型 1-标准快递 2-同城快递 3-当日快递 4-次晨快递 5-即时快递 6-国际快递
 	Weight           float64             // 物品重量
 	Remark           string              // 备注

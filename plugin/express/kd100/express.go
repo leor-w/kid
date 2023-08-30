@@ -302,8 +302,8 @@ func (exp *Express) VerifyCallbackMapPush(data, sign string) (*express.Subscribe
 	}, nil
 }
 
-// BSendExpress 商家寄快递 https://api.kuaidi100.com/document/603cb649a62a19500e19866b#section_0
-func (exp *Express) BSendExpress(params *express.SendExpressParams) (*express.SendExpressResponse, error) {
+// BShipmentOrder 商家寄快递 https://api.kuaidi100.com/document/603cb649a62a19500e19866b#section_0
+func (exp *Express) BShipmentOrder(params *express.SendExpressParams) (*express.SendExpressResponse, error) {
 	var callback int
 	if params.Callback {
 		callback = 1
@@ -354,13 +354,60 @@ func (exp *Express) BSendExpress(params *express.SendExpressParams) (*express.Se
 	}, nil
 }
 
-func (exp *Express) CSendExpress(params *express.SendExpressParams) (*express.SendExpressResponse, error) {
-	//TODO implement me
-	panic("implement me")
+// CShipmentOrder 客户寄快递 https://api.kuaidi100.com/document/cduan-ji-jian-jie-kou-wen-dang#section_0
+func (exp *Express) CShipmentOrder(params *express.SendExpressParams) (*express.SendExpressResponse, error) {
+	callback := "0"
+	if params.Callback {
+		callback = "1"
+	}
+	var req = &CShipmentOrderReq{
+		Kuaidicom:        string(GetStandardMapCompanyCode(params.CompCode)),
+		RecManName:       params.Recipient,
+		RecManMobile:     params.RecipientPhone,
+		RecManPrintAddr:  params.RecipientAddr,
+		SendManName:      params.SenderName,
+		SendManMobile:    params.SenderPhone,
+		SendManPrintAddr: params.SenderAddr,
+		CallBackUrl:      params.CallbackUrl,
+		Cargo:            params.ItemName,
+		Payment:          GetPayType(params.PayType),
+		Weight:           cast.ToString(params.Weight),
+		Remark:           params.Remark,
+		DayType:          params.DayType,
+		PickupStartTime:  params.StartTime,
+		PickupEndTime:    params.EndTime,
+		Salt:             exp.options.Salt,
+		Op:               callback,
+		PollCallBackUrl:  params.CallbackUrl,
+		Resultv2:         cast.ToString(params.CustomParams[ResultV2]),
+		ThirdOrderId:     params.TradeNo,
+	}
+	paramsJson, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("序列化请求参数失败：%s", err.Error())
+	}
+	paramsStr := string(paramsJson)
+	values := url.Values{}
+	values.Set("method", "cOrder")
+	values.Set("key", exp.options.Key)
+	values.Set("sign", exp.Sign(paramsStr+exp.options.Key+exp.options.Secret))
+	values.Set("t", cast.ToString(time.Now().UnixMilli()))
+	values.Set("param", paramsStr)
+	var resp CShipmentOrderResp
+	if err := exp.cli.DoPost("/order/corderapi.do", &values, &resp); err != nil {
+		return nil, fmt.Errorf("创建订单失败：%s", err.Error())
+	}
+	if resp.Result != true {
+		return nil, fmt.Errorf("创建订单失败: 错误码: [%s], 错误信息: [%s]", resp.ReturnCode, resp.Message)
+	}
+	return &express.SendExpressResponse{
+		TaskID:  resp.Data.TaskId,
+		OrderNo: resp.Data.OrderId,
+	}, nil
 }
 
-// BSendExpressVerify 商家下单回调接口 https://api.kuaidi100.com/document/603cb649a62a19500e19866b#section_1
-func (exp *Express) BSendExpressVerify(sign, params string) (*express.BSendExpressCallbackPush, error) {
+// BShipmentCallbackVerify 商家下单回调接口 https://api.kuaidi100.com/document/603cb649a62a19500e19866b#section_1
+func (exp *Express) BShipmentCallbackVerify(sign, params string) (*express.BSendExpressCallbackPush, error) {
 	if !exp.Verify(sign, params) {
 		return nil, fmt.Errorf("验证签名失败")
 	}
@@ -392,13 +439,30 @@ func (exp *Express) BSendExpressVerify(sign, params string) (*express.BSendExpre
 	}, nil
 }
 
-func (exp *Express) CSendExpressVerify(sign, params string) (*express.CSendExpressCallbackPush, error) {
-	//TODO implement me
-	panic("implement me")
+// CShipmentCallbackVerify 客户下单回调接口 https://api.kuaidi100.com/document/cduan-ji-jian-jie-kou-wen-dang#section_1
+func (exp *Express) CShipmentCallbackVerify(sign, params string) (*express.CSendExpressCallbackPush, error) {
+	if exp.Verify(sign, params) {
+		return nil, fmt.Errorf("验证签名失败")
+	}
+	var push CShipmentOrderCallback
+	if err := json.Unmarshal([]byte(params), &push); err != nil {
+		return nil, fmt.Errorf("解析推送数据失败：%s", err.Error())
+	}
+
+	return &express.CSendExpressCallbackPush{
+		CompCode:         GetStandardCode(push.Kuaidicom),
+		ExpNo:            push.Kuaidinum,
+		OrderId:          push.Data.OrderId,
+		Status:           cast.ToInt(push.Status),
+		PickupAgentName:  push.Data.CourierName,
+		PickupAgentPhone: push.Data.CourierMobile,
+		Weight:           cast.ToFloat64(push.Data.Weight),
+		Freight:          cast.ToFloat64(push.Data.Freight),
+	}, nil
 }
 
-// BCancelExpress 商家寄件下单取消接口 https://api.kuaidi100.com/document/603cb649a62a19500e19866b#section_2
-func (exp *Express) BCancelExpress(params *express.CancelExpressParams) (*express.CancelExpressResponse, error) {
+// BCancelShipmentOrder 商家寄件下单取消接口 https://api.kuaidi100.com/document/603cb649a62a19500e19866b#section_2
+func (exp *Express) BCancelShipmentOrder(params *express.CancelExpressParams) (*express.CancelExpressResponse, error) {
 	var req = &BCancelShipmentOrderReq{
 		OrderId:   params.OrderId,
 		TaskId:    params.TaskId,
@@ -429,13 +493,40 @@ func (exp *Express) BCancelExpress(params *express.CancelExpressParams) (*expres
 	}, nil
 }
 
-func (exp *Express) CCancelExpress(params *express.CancelExpressParams) (*express.CancelExpressResponse, error) {
-	//TODO implement me
-	panic("implement me")
+// CCancelShipmentOrder 客户寄件下单取消接口 https://api.kuaidi100.com/document/cduan-ji-jian-jie-kou-wen-dang#section_2
+func (exp *Express) CCancelShipmentOrder(params *express.CancelExpressParams) (*express.CancelExpressResponse, error) {
+	var req = &CShipmentOrderCancelReq{
+		TaskId:    params.TaskId,
+		OrderId:   params.OrderId,
+		CancelMsg: params.Reason,
+	}
+	paramsJson, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("序列化请求参数失败：%s", err.Error())
+	}
+	paramsStr := string(paramsJson)
+	values := url.Values{}
+	values.Set("method", "cancel")
+	values.Set("key", exp.options.Key)
+	values.Set("sign", exp.Sign(paramsStr+exp.options.Key+exp.options.Secret))
+	values.Set("t", cast.ToString(time.Now().UnixMilli()))
+	values.Set("param", paramsStr)
+	var resp CShipmentOrderCancelResp
+	if err := exp.cli.DoPost("/order/corderapi.do", &values, &resp); err != nil {
+		return nil, fmt.Errorf("取消订单失败：%s", err.Error())
+	}
+	if !resp.Result {
+		return nil, fmt.Errorf("取消订单失败: 错误码: [%s], 错误信息: [%s]", resp.ReturnCode, resp.Message)
+	}
+	return &express.CancelExpressResponse{
+		Success: resp.Result,
+		Code:    resp.ReturnCode,
+		Msg:     resp.Message,
+	}, nil
 }
 
-// BExpressPushVerify 快递信息推送接口 https://api.kuaidi100.com/document/603cb649a62a19500e19866b#section_4
-func (exp *Express) BExpressPushVerify(sign, params string) (*express.SubscribeCallbackPush, error) {
+// BShipmentExpressPushVerify 快递信息推送接口 https://api.kuaidi100.com/document/603cb649a62a19500e19866b#section_4
+func (exp *Express) BShipmentExpressPushVerify(sign, params string) (*express.SubscribeCallbackPush, error) {
 	if !exp.Verify(sign, params) {
 		return nil, fmt.Errorf("验证签名失败")
 	}
@@ -477,13 +568,48 @@ func (exp *Express) BExpressPushVerify(sign, params string) (*express.SubscribeC
 	}, nil
 }
 
-func (exp *Express) CExpressPushVerify(sign, params string) (*express.SubscribeCallbackPush, error) {
-	//TODO implement me
-	panic("implement me")
+func (exp *Express) CShipmentExpressPushVerify(sign, params string) (*express.SubscribeCallbackPush, error) {
+	if exp.Verify(sign, params) {
+		return nil, fmt.Errorf("验证签名失败")
+	}
+	var push CExpressCallbackPush
+	if err := json.Unmarshal([]byte(params), &push); err != nil {
+		return nil, fmt.Errorf("解析推送数据失败：%s", err.Error())
+	}
+	var isSigned bool
+	if push.LastResult.Ischeck == "1" {
+		isSigned = true
+	}
+	var tracks []*express.Track
+	for _, datum := range push.LastResult.Data {
+		trackTime, err := time.Parse("2006-01-02 15:04:05", datum.Time)
+		if err != nil {
+			return nil, fmt.Errorf("解析时间 [%s] 失败：%s", datum.Time, err.Error())
+		}
+		tracks = append(tracks, &express.Track{
+			Description: datum.Context,
+			Time:        trackTime,
+			AreaCode:    datum.AreaCode,
+			Area:        datum.AreaName,
+			Status:      GetStatusToStandardState(datum.StatusCode),
+			Location:    datum.Location,
+			Coordinates: datum.AreaCenter,
+		})
+	}
+	return &express.SubscribeCallbackPush{
+		Status:            push.Status,
+		Message:           push.Message,
+		ShouldResubscribe: false,
+		State:             GetStatusToStandardState(push.LastResult.State),
+		IsSigned:          isSigned,
+		CompCode:          GetStandardCode(push.LastResult.Com),
+		ExpNo:             push.LastResult.Nu,
+		Tracks:            tracks,
+	}, nil
 }
 
-// QueryBSendExpress 商家寄件信息查询接口 https://api.kuaidi100.com/document/603cb649a62a19500e19866b#section_8
-func (exp *Express) QueryBSendExpress(taskId string) (*express.QueryBSendExpressResponse, error) {
+// QueryBShipmentOrder 商家寄件信息查询接口 https://api.kuaidi100.com/document/603cb649a62a19500e19866b#section_8
+func (exp *Express) QueryBShipmentOrder(taskId string) (*express.QueryBSendExpressResponse, error) {
 	var req = &BQueryShipmentOrderReq{
 		TaskId: taskId,
 	}

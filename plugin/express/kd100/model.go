@@ -584,6 +584,7 @@ type CShipmentOrderCallback struct {
 		CourierName   string `json:"courierName"`   // 快递员姓名
 		CourierMobile string `json:"courierMobile"` // 快递员手机号
 		Weight        string `json:"weight"`        // 货物重量
+		Freight       string `json:"freight"`       // 运费
 		DefPrice      string `json:"defPrice"`      // 货物保价金额
 	} `json:"data"` // 接口调用结果数据
 }
@@ -619,6 +620,46 @@ type CQueryShipmentPriceResp struct {
 	Data       struct {
 		Price string `json:"price"`
 	} `json:"data"`
+}
+
+// CExpressCallbackPush 寄件订单推送数据
+type CExpressCallbackPush struct {
+	Status     string `json:"status"`
+	Billstatus string `json:"billstatus"`
+	Message    string `json:"message"`
+	LastResult struct {
+		Message string `json:"message"`
+		Nu      string `json:"nu"`
+		Ischeck string `json:"ischeck"`
+		Com     string `json:"com"`
+		Status  string `json:"status"`
+		Data    []struct {
+			Time       string `json:"time"`
+			Context    string `json:"context"`
+			Ftime      string `json:"ftime"`
+			AreaCode   string `json:"areaCode"`
+			AreaName   string `json:"areaName"`
+			Status     string `json:"status"`
+			Location   string `json:"location"`
+			AreaCenter string `json:"areaCenter"`
+			AreaPinYin string `json:"areaPinYin"`
+			StatusCode string `json:"statusCode"`
+		} `json:"data"`
+		State     string `json:"state"`
+		Condition string `json:"condition"`
+		RouteInfo struct {
+			From struct {
+				Number string `json:"number"`
+				Name   string `json:"name"`
+			} `json:"from"`
+			Cur struct {
+				Number string `json:"number"`
+				Name   string `json:"name"`
+			} `json:"cur"`
+			To interface{} `json:"to"`
+		} `json:"routeInfo"`
+		IsLoop bool `json:"isLoop"`
+	} `json:"lastResult"`
 }
 
 // --------------------------- C端寄件 ---------------------------

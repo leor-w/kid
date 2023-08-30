@@ -164,8 +164,8 @@ var PayTypeMap = map[express.PayType]string{
 	express.PayTypeMonthly:   "MONTHLY",
 }
 
-func GetPayType(payType string) string {
-	return PayTypeMap[PayTypeReverseMap[payType]]
+func GetPayType(payType express.PayType) string {
+	return PayTypeMap[payType]
 }
 
 var PayTypeReverseMap = map[string]express.PayType{
