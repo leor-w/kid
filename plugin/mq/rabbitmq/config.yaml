@@ -1,0 +1,38 @@
+# 只有一个RabbitMQ的情况
+rabbitmq:
+  user: user
+  pwd: pwd
+  host: localhost
+  port: 5672
+  queue:
+    - name: queue
+      exchange: exchange
+      key: key
+    - name: queue2
+      exchange: exchange2
+      key: key2
+
+# 有多个不同的RabbitMQ的情况
+rabbitmq:
+  mq1:
+    user: user
+    pwd: pwd
+    addr: localhost:5672
+    queue:
+      - name: queue
+        exchange: exchange
+        key: key
+      - name: queue2
+        exchange: exchange2
+        key: key2
+  mq2:
+    user: user
+    pwd: pwd
+    addr: localhost:5672
+    queue:
+      - name: queue
+        exchange: exchange
+        key: key
+      - name: queue2
+        exchange: exchange2
+        key: key2
