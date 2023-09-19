@@ -11,7 +11,6 @@ type Turnstile struct {
 	CoinCount  uint64
 	PassCount  uint64
 	State      State
-	States     []State
 }
 
 const (
@@ -23,7 +22,7 @@ func Coin(form, to State, args ...interface{}) error {
 	ts := args[0].(*Turnstile)
 	fmt.Printf("转门 [%d] 投币\n", ts.ID)
 	ts.CoinCount++
-	ts.State = StateOpen
+	ts.State = to
 	return nil
 }
 
@@ -32,7 +31,7 @@ func Push(form, to State, args ...interface{}) error {
 	ts := args[0].(*Turnstile)
 	fmt.Printf("转门 [%d] 打开, 通过\n", ts.ID)
 	ts.PassCount++
-	ts.State = StateLock
+	ts.State = to
 	return nil
 }
 
@@ -50,9 +49,8 @@ func Locked(form, to State, args ...interface{}) error {
 
 func TestFSM(t *testing.T) {
 	ts := &Turnstile{
-		ID:     1,
-		State:  StateLock,
-		States: []State{StateOpen, StateLock},
+		ID:    1,
+		State: StateLock,
 	}
 	fsm := initFSM()
 
