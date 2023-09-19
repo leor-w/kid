@@ -268,7 +268,7 @@ func New(opts ...Option) *Wechat {
 		o(&options)
 	}
 	cache := cache.NewRedis(context.Background(), &cache.RedisOpts{
-		Host:        config.GetString("redis.host"),
+		Host:        config.GetString("redis.addr"),
 		Password:    config.GetString("redis.password"),
 		Database:    config.GetInt("redis.db"),
 		MaxIdle:     10,
