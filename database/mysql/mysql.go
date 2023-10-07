@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/leor-w/injector"
+
 	"gorm.io/gorm/logger"
 
 	"github.com/leor-w/kid/database/repos/where"
 
 	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/utils"
 
 	"gorm.io/driver/mysql"
@@ -24,7 +25,7 @@ type MySQL struct {
 
 func (conn *MySQL) Provide(ctx context.Context) interface{} {
 	var confName string
-	name, ok := ctx.Value(plugin.NameKey{}).(string)
+	name, ok := ctx.Value(injector.NameKey{}).(string)
 	if ok && len(name) > 0 {
 		confName = "." + name
 	}

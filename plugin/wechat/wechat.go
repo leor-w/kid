@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/leor-w/injector"
+
 	"github.com/wechatpay-apiv3/wechatpay-go/services/refunddomestic"
 
 	"github.com/silenceper/wechat/v2"
@@ -25,7 +27,6 @@ import (
 	v3Utils "github.com/wechatpay-apiv3/wechatpay-go/utils"
 
 	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/plugin/wechat/payments"
 	"github.com/leor-w/kid/utils"
 )
@@ -61,7 +62,7 @@ type Wechat struct {
 
 func (w *Wechat) Provide(ctx context.Context) interface{} {
 	var confName string
-	if name, ok := ctx.Value(plugin.NameKey{}).(string); ok && len(name) > 0 {
+	if name, ok := ctx.Value(injector.NameKey{}).(string); ok && len(name) > 0 {
 		confName = "." + name
 	}
 	confPrefix := fmt.Sprintf("wechat%s", confName)

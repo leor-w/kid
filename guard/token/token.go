@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/leor-w/injector"
+
 	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/guard"
-	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/utils"
 	"github.com/leor-w/kid/utils/signature"
 )
@@ -20,7 +21,7 @@ type Token struct {
 
 func (token *Token) Provide(ctx context.Context) interface{} {
 	var confName string
-	if name, ok := ctx.Value(plugin.NameKey{}).(string); ok && len(name) > 0 {
+	if name, ok := ctx.Value(injector.NameKey{}).(string); ok && len(name) > 0 {
 		confName = "." + name
 	}
 	confPrefix := fmt.Sprintf("token%s", confName)

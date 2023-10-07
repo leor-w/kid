@@ -3,10 +3,11 @@ package rbac
 import (
 	"context"
 	"fmt"
+
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"github.com/leor-w/injector"
 	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/utils"
 )
 
@@ -40,7 +41,7 @@ func (ctrl *Controller) Init() error {
 
 func (ctrl *Controller) Provide(ctx context.Context) interface{} {
 	var confName string
-	name, ok := ctx.Value(plugin.NameKey{}).(string)
+	name, ok := ctx.Value(injector.NameKey{}).(string)
 	if ok && len(name) > 0 {
 		confName = "." + name
 	}

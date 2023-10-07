@@ -11,9 +11,10 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/leor-w/injector"
+
 	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/logger"
-	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/utils"
 )
 
@@ -32,7 +33,7 @@ type Express struct {
 
 func (express *Express) Provide(ctx context.Context) interface{} {
 	var confName string
-	name, ok := ctx.Value(plugin.NameKey{}).(string)
+	name, ok := ctx.Value(injector.NameKey{}).(string)
 	if ok && len(name) > 0 {
 		confName = "." + name
 	}

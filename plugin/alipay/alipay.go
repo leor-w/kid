@@ -3,11 +3,13 @@ package alipay
 import (
 	"context"
 	"fmt"
+
+	"github.com/leor-w/injector"
+	"github.com/smartwalle/alipay/v3"
+
 	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/logger"
-	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/utils"
-	"github.com/smartwalle/alipay/v3"
 )
 
 type Alipay struct {
@@ -29,7 +31,7 @@ const (
 
 func (pay *Alipay) Provide(ctx context.Context) interface{} {
 	var confName string
-	name, ok := ctx.Value(new(plugin.NameKey)).(string)
+	name, ok := ctx.Value(new(injector.NameKey)).(string)
 	if ok && len(name) > 0 {
 		confName = "." + name
 	}

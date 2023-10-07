@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/leor-w/injector"
+
 	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/utils"
 )
 
@@ -24,7 +25,7 @@ type Option func(*Options)
 
 func (douyin *Douyin) Provide(ctx context.Context) interface{} {
 	var confName string
-	if name, ok := ctx.Value(plugin.NameKey{}).(string); ok && len(name) > 0 {
+	if name, ok := ctx.Value(injector.NameKey{}).(string); ok && len(name) > 0 {
 		confName = "." + name
 	}
 	confPrefix := fmt.Sprintf("douyin%s", confName)

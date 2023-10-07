@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/leor-w/injector"
+
 	"github.com/qiniu/go-sdk/v7/auth"
 
 	"github.com/qiniu/go-sdk/v7/cdn"
@@ -15,7 +17,6 @@ import (
 	"github.com/jinzhu/copier"
 
 	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/utils"
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
@@ -31,7 +32,7 @@ type Qiniu struct {
 
 func (qiniu *Qiniu) Provide(ctx context.Context) interface{} {
 	var confName string
-	if name, ok := ctx.Value(plugin.NameKey{}).(string); ok && len(name) > 0 {
+	if name, ok := ctx.Value(injector.NameKey{}).(string); ok && len(name) > 0 {
 		confName = "." + name
 	}
 	confPrefix := fmt.Sprintf("qiniu%s", confName)
