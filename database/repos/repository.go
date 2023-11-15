@@ -13,12 +13,12 @@ import (
 )
 
 type (
-	// IBasicRepository 基础查询与事务
+	// IBasicRepository MySQL基础查询与事务
 	IBasicRepository interface {
 		IRepository
 		ITxRepository
 	}
-	// IRepository 基础查询
+	// IRepository MySQL基础查询
 	IRepository interface {
 		Exist(*finder.Finder) bool
 		GetOne(*finder.Finder) error
@@ -33,12 +33,20 @@ type (
 		Count(*finder.Finder) error
 		Sum(*finder.Sum) error
 	}
-	// ITxRepository 事务
+	// ITxRepository MySQL事务
 	ITxRepository interface {
 		Transaction(func(context.Context) error) error                             // 开启新的事物执行
 		GetDb(context.Context) interface{}                                         // 获取数据库连接
 		WhetherTx(context.Context) bool                                            // 检查是否在事务中
 		ExecWithTx(hasTx context.Context, fn func(tx context.Context) error) error // 如果hasTx已经在事务中,则不开启新的事务, 否则开启新的事务执行 fn
+	}
+	// IRedisRepository Redis基础查询
+	IRedisRepository interface {
+		Set(key string, value interface{}, expire int64) error
+		Get(key string) (string, error)
+		Del(keys ...string) error
+		Expire(key string, expire int64) error
+		Exists(key string) (bool, error)
 	}
 )
 

@@ -37,7 +37,7 @@ type RouterGroup struct {
 	*gin.RouterGroup
 }
 
-type HandleFunc func(*Context) interface{}
+type HandleFunc func(*Context) any
 
 type Middleware func(*Context)
 
