@@ -7,7 +7,7 @@ type RedisRepository struct {
 }
 
 func (repo *RedisRepository) Set(key string, value interface{}, expire int64) error {
-	return repo.RDB.Set(key, value, time.Duration(expire)).Err()
+	return repo.RDB.Set(key, value, time.Duration(expire)*time.Second).Err()
 }
 
 func (repo *RedisRepository) Get(key string) (string, error) {
@@ -19,7 +19,7 @@ func (repo *RedisRepository) Del(keys ...string) error {
 }
 
 func (repo *RedisRepository) Expire(key string, expire int64) error {
-	return repo.RDB.Expire(key, time.Duration(expire)).Err()
+	return repo.RDB.Expire(key, time.Duration(expire)*time.Second).Err()
 }
 
 func (repo *RedisRepository) Exists(key string) (bool, error) {
