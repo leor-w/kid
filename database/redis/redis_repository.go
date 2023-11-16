@@ -1,9 +1,16 @@
 package redis
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type RedisRepository struct {
 	RDB *Client `inject:""`
+}
+
+func (repo *RedisRepository) Provide(context.Context) any {
+	return repo
 }
 
 func (repo *RedisRepository) Set(key string, value interface{}, expire int64) error {
