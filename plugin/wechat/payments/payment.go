@@ -9,14 +9,14 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/core"
 )
 
-type PaymentType string
+type WechatPaySDK string
 
 const (
-	PaymentTypeAPP    PaymentType = "APP"    // app 支付
-	PaymentTypeJSAPI  PaymentType = "JSAPI"  // jsapi 支付 或 小程序支付
-	PaymentTypeH5     PaymentType = "H5"     // h5 支付
-	PaymentTypeNative PaymentType = "NATIVE" // native 网页支付
-	PaymentTypeJSSDK  PaymentType = "JSSDK"
+	PaymentTypeAPP    WechatPaySDK = "APP"    // app 支付
+	PaymentTypeJSAPI  WechatPaySDK = "JSAPI"  // jsapi 支付 或 小程序支付
+	PaymentTypeH5     WechatPaySDK = "H5"     // h5 支付
+	PaymentTypeNative WechatPaySDK = "NATIVE" // native 网页支付
+	PaymentTypeJSSDK  WechatPaySDK = "JSSDK"
 )
 
 var (
@@ -33,7 +33,7 @@ type Payment interface {
 
 type Option func(*Options)
 
-func New(apiType PaymentType, client *core.Client, opts ...Option) (Payment, error) {
+func New(apiType WechatPaySDK, client *core.Client, opts ...Option) (Payment, error) {
 	var options Options
 	for i := range opts {
 		opts[i](&options)

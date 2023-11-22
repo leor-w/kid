@@ -55,7 +55,7 @@ type Wechat struct {
 
 	// API V3 版本 支付
 	notify   *notify.Handler
-	payments map[payments.PaymentType]payments.Payment
+	payments map[payments.WechatPaySDK]payments.Payment
 	client   *core.Client
 	refund   *refunddomestic.RefundsApiService
 }
@@ -152,7 +152,7 @@ func (w *Wechat) Pay() *pay.Pay {
 // ------------------ V3 版本 ------------------
 
 // Payment 微信支付 使用 V3 版本的支付 API 接口
-func (w *Wechat) Payment(payType payments.PaymentType) (payments.Payment, error) {
+func (w *Wechat) Payment(payType payments.WechatPaySDK) (payments.Payment, error) {
 	if w.client == nil {
 		var (
 			mchPrivateKey *rsa.PrivateKey
@@ -283,7 +283,7 @@ func New(opts ...Option) *Wechat {
 		options:  &options,
 		wechat:   apiV2Wechat,
 		cache:    cache,
-		payments: make(map[payments.PaymentType]payments.Payment),
+		payments: make(map[payments.WechatPaySDK]payments.Payment),
 	}
 
 	return w

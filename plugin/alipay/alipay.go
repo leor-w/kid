@@ -29,6 +29,13 @@ const (
 	PayStatusTradeFinished = "TRADE_FINISHED" // 交易完成(不可退款)
 )
 
+type AlipaySDK uint8
+
+const (
+	AlipaySDKAPP  AlipaySDK = iota + 1 // app 支付
+	AlipaySDKPage                      // pc 网页端支付
+)
+
 func (pay *Alipay) Provide(ctx context.Context) interface{} {
 	var confName string
 	name, ok := ctx.Value(new(injector.NameKey)).(string)
@@ -77,11 +84,11 @@ func New(opts ...Option) *Alipay {
 
 func (pay *Alipay) Init() error {
 	if len(pay.options.AppPublicCert) == 0 {
-		if err := pay.LoadAppPublicCertFromFile(pay.options.AppPublicCertFile); err != nil {
+		if err := pay.LoadAppCertPublicKeyFromFile(pay.options.AppPublicCertFile); err != nil {
 			return err
 		}
 	} else {
-		if err := pay.LoadAppPublicCert(pay.options.AppPublicCert); err != nil {
+		if err := pay.LoadAppCertPublicKey(pay.options.AppPublicCert); err != nil {
 			return err
 		}
 	}
@@ -95,11 +102,11 @@ func (pay *Alipay) Init() error {
 		}
 	}
 	if len(pay.options.AliPublicCert) == 0 {
-		if err := pay.LoadAliPayPublicCertFromFile(pay.options.AliPublicCertFile); err != nil {
+		if err := pay.LoadAlipayCertPublicKeyFromFile(pay.options.AliPublicCertFile); err != nil {
 			return err
 		}
 	} else {
-		if err := pay.LoadAliPayPublicCert(pay.options.AliPublicCert); err != nil {
+		if err := pay.LoadAlipayCertPublicKey(pay.options.AliPublicCert); err != nil {
 			return err
 		}
 	}
