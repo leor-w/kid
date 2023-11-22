@@ -16,7 +16,6 @@ const (
 	PaymentTypeJSAPI  WechatPaySDK = "JSAPI"  // jsapi 支付 或 小程序支付
 	PaymentTypeH5     WechatPaySDK = "H5"     // h5 支付
 	PaymentTypeNative WechatPaySDK = "NATIVE" // native 网页支付
-	PaymentTypeJSSDK  WechatPaySDK = "JSSDK"
 )
 
 var (
@@ -42,8 +41,6 @@ func New(apiType WechatPaySDK, client *core.Client, opts ...Option) (Payment, er
 	case PaymentTypeAPP:
 		return NewAPP(client, &options), nil
 	case PaymentTypeJSAPI:
-		return NewBridge(client, &options), nil
-	case PaymentTypeJSSDK:
 		return NewBridge(client, &options), nil
 	case PaymentTypeH5:
 		return NewH5(client, &options), nil
