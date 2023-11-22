@@ -29,11 +29,11 @@ const (
 	PayStatusTradeFinished = "TRADE_FINISHED" // 交易完成(不可退款)
 )
 
-type AlipaySDK uint8
+type AlipaySDK string
 
 const (
-	AlipaySDKAPP  AlipaySDK = iota + 1 // app 支付
-	AlipaySDKPage                      // pc 网页端支付
+	AlipaySDKAPP  AlipaySDK = "APP" // app 支付
+	AlipaySDKPage AlipaySDK = "PC"  // pc 网页端支付
 )
 
 func (pay *Alipay) Provide(ctx context.Context) interface{} {
