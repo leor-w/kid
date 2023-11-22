@@ -45,6 +45,10 @@ func New(status *Status, originals ...error) *Error {
 	return &err
 }
 
+func NewWithString(status *Status, msg string) *Error {
+	return New(status, errors.New(msg))
+}
+
 func (e *Error) GetStatus() *Status {
 	return e.Status
 }
