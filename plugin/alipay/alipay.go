@@ -34,6 +34,7 @@ type AlipaySDK string
 const (
 	AlipaySDKAPP  AlipaySDK = "APP" // app 支付
 	AlipaySDKPage AlipaySDK = "PC"  // pc 网页端支付
+	AliPaySDKWap  AlipaySDK = "WAP" // 手机网页端支付
 )
 
 func (pay *Alipay) Provide(ctx context.Context) interface{} {
