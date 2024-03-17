@@ -16,6 +16,7 @@ const (
 	PaymentTypeJSAPI  WechatPaySDK = "JSAPI"  // jsapi 支付 或 小程序支付
 	PaymentTypeH5     WechatPaySDK = "H5"     // h5 支付
 	PaymentTypeNative WechatPaySDK = "NATIVE" // native 网页支付
+	PaymentTypeJSSDK  WechatPaySDK = "JSSDK"  // jssdk 支付
 )
 
 var (

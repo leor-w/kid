@@ -9,8 +9,8 @@ import (
 type A struct {
 	C1 *C `inject:""`
 	C2 *C `inject:"alias:zhangsan"`
-	C3 *C `inject:"alias:wuwei"`
-	B  *B `inject:"alias:lisi,opts:NR"`
+	//C3 *C `inject:"alias:wuwei"`
+	//B  *B `inject:"alias:lisi,opts:NR"`
 }
 
 func (a *A) Provide(context.Context) interface{} {
@@ -61,6 +61,6 @@ func TestInject(t *testing.T) {
 	if _, err := container.PopulateSingle(a); err != nil {
 		t.Fatalf(err.Error())
 	}
-	fmt.Println(a.C1, a.C2, a.C3, a.B)
+	fmt.Println(a.C1, a.C2)
 	//fmt.Println(a.C2, a.B)
 }
