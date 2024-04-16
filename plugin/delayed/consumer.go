@@ -169,8 +169,7 @@ func (c *Consumer) watchSystemSignal() {
 	// 监听所有 Linux 常见的系统退出信号
 	signal.Notify(signals, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT,
 		syscall.SIGILL, syscall.SIGTRAP, syscall.SIGABRT,
-		syscall.SIGBUS, syscall.SIGFPE, syscall.SIGUSR1,
-		syscall.SIGSEGV, syscall.SIGUSR2, syscall.SIGPIPE,
+		syscall.SIGBUS, syscall.SIGFPE, syscall.SIGSEGV, syscall.SIGPIPE,
 		syscall.SIGALRM, syscall.SIGTERM)
 	for {
 		select {
