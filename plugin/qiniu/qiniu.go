@@ -187,6 +187,23 @@ func (qiniu *Qiniu) OperationManager() *storage.OperationManager {
 	return qiniu.operationManager
 }
 
+// GetRegion 获取存储区域
+func (qiniu *Qiniu) GetRegion() (*storage.Region, error) {
+	return storage.GetRegion(qiniu.mac.AccessKey, qiniu.options.bucket)
+}
+
+// NewUploader 获取上传对象
+func (qiniu *Qiniu) NewUploader(cfg *storage.Config) *storage.FormUploader {
+	region, err := qiniu.GetRegion()
+	if err != nil {
+		return nil
+	}
+	if cfg.Region == nil {
+		cfg.Region = region
+	}
+	return storage.NewFormUploader(cfg)
+}
+
 func New(opts ...Option) *Qiniu {
 	options := &Options{
 		private: false,
