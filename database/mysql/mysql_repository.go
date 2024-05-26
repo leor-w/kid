@@ -87,7 +87,7 @@ func (repo *Repository) Exist(finder *finder.Finder) bool {
 	var count int64
 	if err := db.
 		Model(finder.Model).
-		Scopes(Wheres(finder.Wheres)).
+		Scopes(Wheres(finder.Wheres.Wheres...)).
 		Count(&count).
 		Error; err != nil {
 		logger.Errorf("mysql_repository.go Exist error: %v", err.Error())
@@ -100,7 +100,7 @@ func (repo *Repository) Exist(finder *finder.Finder) bool {
 }
 
 func (repo *Repository) GetOne(finder *finder.Finder) error {
-	db := repo.DB.Scopes(Wheres(finder.Wheres))
+	db := repo.DB.Scopes(Wheres(finder.Wheres.Wheres...))
 	if finder.Debug {
 		db.Debug()
 	}
@@ -121,8 +121,16 @@ func (repo *Repository) GetOne(finder *finder.Finder) error {
 	return nil
 }
 
+func (repo *Repository) GetById(id int64, model interface{}) error {
+	return repo.DB.First(model, id).Error
+}
+
+func (repo *Repository) GetByKV(kv map[string]interface{}, model interface{}) error {
+	return repo.DB.Where(kv).First(model).Error
+}
+
 func (repo *Repository) Find(finder *finder.Finder) error {
-	db := repo.DB.Scopes(Wheres(finder.Wheres))
+	db := repo.DB.Scopes(Wheres(finder.Wheres.Wheres...))
 	if finder.Debug {
 		db.Debug()
 	}
@@ -176,7 +184,7 @@ func (repo *Repository) Save(creator *creator.Creator) error {
 }
 
 func (repo *Repository) Update(updater *updater.Updater) error {
-	db := repo.getTx(updater.Tx).Scopes(Wheres(updater.Wheres))
+	db := repo.getTx(updater.Tx).Scopes(Wheres(updater.Wheres.Wheres...))
 	if updater.Debug {
 		db.Debug()
 	}
@@ -202,6 +210,10 @@ func (repo *Repository) Update(updater *updater.Updater) error {
 	return MissingUpdates
 }
 
+func (repo *Repository) UpdateByKV(data interface{}, kv map[string]interface{}) error {
+	return repo.DB.Model(data).Where(kv).Updates(data).Error
+}
+
 func (repo *Repository) Delete(deleter *deleter.Deleter) error {
 	var db = repo.getTx(deleter.Tx)
 	if deleter.Debug {
@@ -209,7 +221,7 @@ func (repo *Repository) Delete(deleter *deleter.Deleter) error {
 	}
 	return db.
 		Model(deleter.Model).
-		Scopes(Wheres(deleter.Wheres)).
+		Scopes(Wheres(deleter.Wheres.Wheres...)).
 		Delete(nil).
 		Error
 }
@@ -226,10 +238,10 @@ func (repo *Repository) GetUniqueID(finder *finder.Finder, min, max, ignoreStart
 	var uniqueId int64
 	for {
 		id := utils.UniqueId(min, max)
-		if ignoreStart > 0 && ignoreEnd > 0 && uniqueId >= ignoreStart && uniqueId <= ignoreEnd {
+		if ignoreStart > 0 && ignoreEnd > 0 && ignoreStart <= uniqueId && uniqueId <= ignoreEnd {
 			continue
 		}
-		finder.Wheres[0].V1 = id
+		finder.Wheres.Wheres[0].V1 = id
 		if repo.Exist(finder) {
 			continue
 		}
@@ -246,7 +258,7 @@ func (repo *Repository) Count(finder *finder.Finder) error {
 	}
 	if err := db.
 		Model(finder.Model).
-		Scopes(Wheres(finder.Wheres)).
+		Scopes(Wheres(finder.Wheres.Wheres...)).
 		Count(finder.Total).
 		Error; err != nil {
 		return repo.handleErr(finder.IgnoreNotFound, err)
@@ -263,7 +275,7 @@ func (repo *Repository) Sum(sum *finder.Sum) error {
 	if err := db.
 		Model(sum.Model).
 		Scopes(
-			Wheres(sum.Wheres),
+			Wheres(sum.Wheres.Wheres...),
 			Sum(sum.Col, sum.Val),
 		).
 		Error; err != nil {

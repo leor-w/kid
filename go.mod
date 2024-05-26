@@ -1,6 +1,6 @@
 module github.com/leor-w/kid
 
-go 1.18
+go 1.20
 
 require (
 	github.com/alibabacloud-go/afs-20180112 v0.1.0

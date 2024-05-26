@@ -35,115 +35,132 @@ func (w *Where) Build() (string, []interface{}) {
 	return fmt.Sprintf("%s %s ?", w.Column, w.Condition), []interface{}{w.V1}
 }
 
-type Wheres []*Where
-
-func New() Wheres {
-	return make(Wheres, 0)
+type Wheres struct {
+	Wheres []*Where
+	isOr   bool
 }
 
-func (w Wheres) And(wheres ...*Where) Wheres {
-	return append(w, wheres...)
-}
-
-func (w Wheres) Or(wheres ...*Where) Wheres {
-	for _, where := range wheres {
-		where.Or = true
+func And() *Wheres {
+	return &Wheres{
+		Wheres: make([]*Where, 0),
 	}
-	return append(w, wheres...)
 }
 
-func Eq(column string, value interface{}) *Where {
-	return &Where{
+func Or() *Wheres {
+	return &Wheres{
+		Wheres: make([]*Where, 0),
+		isOr:   true,
+	}
+}
+
+func (w *Wheres) add(where *Where) *Wheres {
+	w.Wheres = append(w.Wheres, where)
+	return w
+}
+
+func (w *Wheres) Eq(column string, value interface{}) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: "=",
 		V1:        value,
-	}
+		Or:        w.isOr,
+	})
 }
 
-func Neq(column string, value interface{}) *Where {
-	return &Where{
+func (w *Wheres) Neq(column string, value interface{}) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: "<>",
 		V1:        value,
-	}
+		Or:        w.isOr,
+	})
 }
 
-func Gt(column string, value interface{}) *Where {
-	return &Where{
+func (w *Wheres) Gt(column string, value interface{}) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: ">",
 		V1:        value,
-	}
+		Or:        w.isOr,
+	})
 }
 
-func Gte(column string, value interface{}) *Where {
-	return &Where{
+func (w *Wheres) Gte(column string, value interface{}) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: ">=",
 		V1:        value,
-	}
+		Or:        w.isOr,
+	})
 }
 
-func Lt(column string, value interface{}) *Where {
-	return &Where{
+func (w *Wheres) Lt(column string, value interface{}) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: "<",
 		V1:        value,
-	}
+		Or:        w.isOr,
+	})
 }
 
-func Lte(column string, value interface{}) *Where {
-	return &Where{
+func (w *Wheres) Lte(column string, value interface{}) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: "<=",
 		V1:        value,
-	}
+		Or:        w.isOr,
+	})
 }
 
-func In(column string, value interface{}) *Where {
-	return &Where{
+func (w *Wheres) In(column string, value interface{}) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: "IN",
 		V1:        value,
-	}
+		Or:        w.isOr,
+	})
 }
 
-func NotIn(column string, value interface{}) *Where {
-	return &Where{
+func (w *Wheres) NotIn(column string, value interface{}) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: "NOT IN",
 		V1:        value,
-	}
+		Or:        w.isOr,
+	})
 }
 
-func Like(column string, value interface{}) *Where {
-	return &Where{
+func (w *Wheres) Like(column string, value interface{}) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: "LIKE",
 		V1:        value,
-	}
+		Or:        w.isOr,
+	})
 }
 
-func Between(column string, v1, v2 interface{}) *Where {
-	return &Where{
+func (w *Wheres) Between(column string, v1, v2 interface{}) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: "BETWEEN",
 		V1:        v1,
 		V2:        v2,
-	}
+		Or:        w.isOr,
+	})
 }
 
-func IsNull(column string) *Where {
-	return &Where{
+func (w *Wheres) IsNull(column string) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: "IS NULL",
-	}
+		Or:        w.isOr,
+	})
 }
 
-func IsNotNull(column string) *Where {
-	return &Where{
+func (w *Wheres) IsNotNull(column string) *Wheres {
+	return w.add(&Where{
 		Column:    column,
 		Condition: "IS NOT NULL",
-		V1:        nil,
-	}
+		Or:        w.isOr,
+	})
 }

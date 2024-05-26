@@ -22,9 +22,12 @@ type (
 	IRepository interface {
 		Exist(*finder.Finder) bool
 		GetOne(*finder.Finder) error
+		GetById(id int64, model interface{}) error
+		GetByKV(kv map[string]interface{}, model interface{}) error
 		Find(*finder.Finder) error
 		Create(*creator.Creator) error
 		Update(*updater.Updater) error
+		UpdateByKV(data interface{}, kv map[string]interface{}) error
 		Delete(*deleter.Deleter) error
 		Save(*creator.Creator) error
 		Exec(context.Context, string, ...interface{}) error

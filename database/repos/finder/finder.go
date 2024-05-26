@@ -10,7 +10,7 @@ type Finder struct {
 	Model interface{}
 
 	// 查询条件
-	Wheres where.Wheres
+	Wheres *where.Wheres
 
 	// 查询结果保存的对象
 	Recipient interface{}
@@ -43,7 +43,7 @@ type Finder struct {
 // Sum 查询某个字段的和
 type Sum struct {
 	Model  interface{}
-	Wheres where.Wheres
+	Wheres *where.Wheres
 	Col    string
 	Val    interface{}
 	Debug  bool
@@ -58,7 +58,7 @@ func (f *Finder) SetModel(model interface{}) *Finder {
 	return f
 }
 
-func (f *Finder) SetWheres(wheres where.Wheres) *Finder {
+func (f *Finder) SetWheres(wheres *where.Wheres) *Finder {
 	f.Wheres = wheres
 	return f
 }

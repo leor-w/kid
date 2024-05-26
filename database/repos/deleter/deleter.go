@@ -20,7 +20,7 @@ type Deleter struct {
 	Debug bool
 
 	// 条件
-	Wheres where.Wheres
+	Wheres *where.Wheres
 }
 
 func New() *Deleter {
@@ -37,7 +37,7 @@ func (d *Deleter) SetModel(model interface{}) *Deleter {
 	return d
 }
 
-func (d *Deleter) SetWheres(wheres where.Wheres) *Deleter {
+func (d *Deleter) SetWheres(wheres *where.Wheres) *Deleter {
 	d.Wheres = wheres
 	return d
 }

@@ -9,7 +9,7 @@ import (
 type Updater struct {
 	Tx       context.Context        // 事务上下文
 	Model    interface{}            // 修改对应的模型
-	Wheres   where.Wheres           // 修改的过滤条件
+	Wheres   *where.Wheres          // 修改的过滤条件
 	Update   interface{}            // 修改的结构体值, 修改整体值时使用
 	Fields   map[string]interface{} // 修改的map值, 用于修改单个或多个字段时使用
 	SaveNil  bool                   // 是否保存空值, 默认不会更新类似 0,false,"" 等值
@@ -34,7 +34,7 @@ func (u *Updater) SetModel(model interface{}) *Updater {
 	return u
 }
 
-func (u *Updater) SetWheres(wheres where.Wheres) *Updater {
+func (u *Updater) SetWheres(wheres *where.Wheres) *Updater {
 	u.Wheres = wheres
 	return u
 }

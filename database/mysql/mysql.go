@@ -138,7 +138,7 @@ const (
 	ConditionTypeIn  = "in"
 )
 
-func Wheres(wheres where.Wheres) func(db *gorm.DB) *gorm.DB {
+func Wheres(wheres ...*where.Where) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if len(wheres) <= 0 {
 			return db
@@ -166,12 +166,12 @@ func Where(wheres []*WhereWrapper) func(db *gorm.DB) *gorm.DB {
 		if len(wheres) <= 0 {
 			return db
 		}
-		for _, where := range wheres {
-			if where.Condition == ConditionTypeIn {
-				db.Where(fmt.Sprintf("%s IN(?)", where.Column), where.Value)
+		for _, wrapper := range wheres {
+			if wrapper.Condition == ConditionTypeIn {
+				db.Where(fmt.Sprintf("%s IN(?)", wrapper.Column), wrapper.Value)
 				continue
 			}
-			db.Where(fmt.Sprintf("%s %s ?", where.Column, where.Condition), where.Value)
+			db.Where(fmt.Sprintf("%s %s ?", wrapper.Column, wrapper.Condition), wrapper.Value)
 		}
 		return db
 	}
@@ -179,10 +179,10 @@ func Where(wheres []*WhereWrapper) func(db *gorm.DB) *gorm.DB {
 
 func SearchScope(wheres where.Wheres) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		if len(wheres) <= 0 {
+		if len(wheres.Wheres) <= 0 {
 			return db
 		}
-		for _, w := range wheres {
+		for _, w := range wheres.Wheres {
 			var notNil bool
 			switch vt := w.V1.(type) {
 			case string:
@@ -204,16 +204,16 @@ func Search(wheres []*WhereWrapper) func(db *gorm.DB) *gorm.DB {
 		if len(wheres) <= 0 {
 			return db
 		}
-		for _, where := range wheres {
+		for _, wrapper := range wheres {
 			var notNil bool
-			switch vt := where.Value.(type) {
+			switch vt := wrapper.Value.(type) {
 			case string:
 				notNil = vt != ""
 			case uint8, int8, uint, int, uint32, int32, uint16, int16, uint64, int64, float32, float64:
 				notNil = vt != 0
 			}
 			if notNil {
-				db.Or(fmt.Sprintf("%s LIKE '%%%v%%'", where.Column, where.Value))
+				db.Or(fmt.Sprintf("%s LIKE '%%%v%%'", wrapper.Column, wrapper.Value))
 			}
 		}
 		return db
