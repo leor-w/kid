@@ -11,6 +11,7 @@ require (
 	github.com/alibabacloud-go/tea v1.2.0
 	github.com/alibabacloud-go/tea-rpc v1.3.3
 	github.com/alibabacloud-go/tea-utils/v2 v2.0.3
+	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/casbin/casbin/v2 v2.71.1
 	github.com/casbin/gorm-adapter/v3 v3.18.0
 	github.com/elastic/go-elasticsearch/v7 v7.17.10
@@ -141,6 +142,7 @@ require (
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/time v0.1.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect

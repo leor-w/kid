@@ -1,0 +1,5 @@
+oss:
+  endpoint: oss-cn-shenzhen.aliyuncs.com
+  bucketName:
+  accessKey:
+  secretKey:
