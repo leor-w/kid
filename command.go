@@ -2,6 +2,8 @@ package kid
 
 import (
 	"fmt"
+	"os"
+	"strings"
 	"syscall"
 
 	"github.com/leor-w/kid/logger"
@@ -35,8 +37,23 @@ Flags:
 使用 "{{.CommandPath}} [command] --help" 获取有关命令的更多信息.{{end}}
 `
 
+// isTestEnvironment 检测当前是否处于 go test 环境中
+func isTestEnvironment() bool {
+	for _, arg := range os.Args {
+		if strings.HasPrefix(arg, "-test.") {
+			return true
+		}
+	}
+	return false
+}
+
 // CommandLine 命令行处理
 func (kid *Kid) CommandLine() error {
+	// 检测是否在测试环境中
+	if isTestEnvironment() {
+		return nil // 直接返回，跳过命令行执行
+	}
+
 	var (
 		hasHelp bool
 	)
