@@ -65,7 +65,7 @@ func (group *RouterGroup) UseMiddle(middlewares ...Middleware) {
 	group.RouterGroup.Use(convertMiddleware(middlewares...)...)
 }
 
-func (group *RouterGroup) WrapHandler(handler gin.HandlerFunc) HandleFunc {
+func WrapHandler(handler gin.HandlerFunc) HandleFunc {
 	return func(ctx *Context) any {
 		handler(ctx.Context)
 		return nil
