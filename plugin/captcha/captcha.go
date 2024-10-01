@@ -46,15 +46,17 @@ func (c *Captcha) Provide(ctx context.Context) interface{} {
 	)
 }
 
-func (c *Captcha) Generate() (key string, code string, err error) {
+func (c *Captcha) Generate() (string, string, error) {
 	key, codeContent, answer := c.driver.GenerateIdQuestionAnswer()
 	item, err := c.driver.DrawCaptcha(codeContent)
 	if err != nil {
-		return
+		return "", "", fmt.Errorf("生成验证码错误: %w", err)
 	}
-	err = c.store.Set(key, answer)
-	code = item.EncodeB64string()
-	return
+	if err := c.store.Set(key, answer); err != nil {
+		return "", "", fmt.Errorf("保存行为式验证码错误: %w", err)
+	}
+	code := item.EncodeB64string()
+	return key, code, nil
 }
 
 func (c *Captcha) Verify(key, answer string, clear bool) bool {
