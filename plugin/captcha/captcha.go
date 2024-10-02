@@ -64,7 +64,7 @@ func (c *Captcha) Generate() (string, string, error) {
 func (c *Captcha) Verify(key, answer string, clear bool) bool {
 	vv := c.store.Get(key, clear)
 	vv = strings.TrimSpace(vv)
-	return vv == strings.TrimSpace(answer)
+	return strings.ToLower(vv) == strings.ToLower(answer)
 }
 
 func New(opts ...Option) *Captcha {
