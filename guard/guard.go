@@ -19,20 +19,23 @@ type User struct {
 
 // Guard API 入口守卫
 type Guard interface {
-	License(*User) (string, error)                // 发行令牌
-	GetLicense(UserType, int64) ([]string, error) // 获取用户登录令牌
-	Verify(string) (*User, error)                 // 验证令牌
-	Cancellation(string) error                    // 吊销令牌
-	CancellationAll(UserType, int64) error        // 吊销用户所有令牌
-	ExpiresAt(string) int64                       // 获取令牌有效时间
-	IssuerAt(string) int64                        // 获取令牌发行时间
+	License(*User) (string, string, error)                // 发行凭证，同时返回刷新凭证
+	RefreshLicense(refreshLicense string) (string, error) // 刷新凭证
+	GetLicense(UserType, int64) ([]string, error)         // 获取用户登录令牌
+	Verify(string) (*User, error)                         // 验证令牌
+	Cancellation(string) error                            // 吊销令牌
+	CancellationAll(UserType, int64) error                // 吊销用户所有令牌
+	ExpiresAt(string) int64                               // 获取令牌有效时间
+	IssuerAt(string) int64                                // 获取令牌发行时间
 }
 
 type TokenInfo struct {
 	User
-	Token     string `json:"token"`
-	ExpiredAt int64  `json:"expired_at"`
-	IssuerAt  int64  `json:"issuer_at"`
+	Token                 string `json:"token"`
+	RefreshToken          string `json:"refresh_token"`
+	RefreshTokenExpiredAt int64  `json:"refresh_token_expired_at"`
+	ExpiredAt             int64  `json:"expired_at"`
+	IssuerAt              int64  `json:"issuer_at"`
 }
 
 type UserToken struct {

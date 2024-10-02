@@ -37,13 +37,13 @@ func (token *Token) Provide(ctx context.Context) interface{} {
 
 type Option func(*Options)
 
-func (token *Token) License(user *guard.User) (string, error) {
+func (token *Token) License(user *guard.User) (string, string, error) {
 	var (
 		tokenDetail *guard.TokenInfo
 		tokenStr    string
 	)
 	if user.Uid <= 0 {
-		return "", errors.New("用户 ID 不能为 0")
+		return "", "", errors.New("用户 ID 不能为 0")
 	}
 	for {
 		tokenDetail = &guard.TokenInfo{
@@ -53,11 +53,11 @@ func (token *Token) License(user *guard.User) (string, error) {
 		}
 		data, err := signature.EncodeToURLBase64(tokenDetail)
 		if err != nil {
-			return "", err
+			return "", "", err
 		}
 		tokenStr, err = signature.SignHMACHS384.Sign(data, token.options.secret)
 		if err != nil {
-			return "", err
+			return "", "", err
 		}
 		tokenDetail.Token = tokenStr
 		if token.store.Exist(tokenStr) {
@@ -66,9 +66,13 @@ func (token *Token) License(user *guard.User) (string, error) {
 		break
 	}
 	if err := token.store.Save(tokenStr, tokenDetail); err != nil {
-		return "", err
+		return "", "", err
 	}
-	return tokenStr, nil
+	return tokenStr, "", nil
+}
+
+func (token *Token) RefreshLicense(refreshLicense string) (string, error) {
+	return "", nil
 }
 
 func (token *Token) GetLicense(userType guard.UserType, uid int64) ([]string, error) {

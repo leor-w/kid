@@ -6,6 +6,7 @@ import (
 
 type Options struct {
 	Issuer        string
+	RefreshExpire time.Duration
 	Expire        time.Duration
 	SigningMethod SigningMethod
 	Key           []byte
@@ -14,6 +15,12 @@ type Options struct {
 func WithIssuer(issuer string) Option {
 	return func(o *Options) {
 		o.Issuer = issuer
+	}
+}
+
+func WithRefreshExpire(refreshExpire time.Duration) Option {
+	return func(o *Options) {
+		o.RefreshExpire = refreshExpire
 	}
 }
 
