@@ -14,6 +14,8 @@ import (
 	"github.com/mojocn/base64Captcha"
 )
 
+const Sources = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
 type Captcha struct {
 	store         Store `inject:""`
 	driver        base64Captcha.Driver
@@ -110,13 +112,13 @@ func (c *Captcha) Init() error {
 	case VerifyTypeAudio:
 		c.driver = base64Captcha.NewDriverAudio(c.options.CaptchaLen, c.options.Audio.Language)
 	case VerifyTypeCharacter:
-		driver := base64Captcha.NewDriverString(
+		c.driver = base64Captcha.NewDriverString(
 			c.options.Height,
 			c.options.Width,
 			c.options.NoiseCount,
 			c.options.GetShowLine(),
 			c.options.CaptchaLen,
-			"",
+			Sources,
 			bgColor,
 			base64Captcha.DefaultEmbeddedFonts,
 			[]string{
@@ -130,8 +132,7 @@ func (c *Captcha) Init() error {
 				"actionj.ttf",
 				"chromohv.ttf",
 				"wqy-microhei.ttc",
-			})
-		c.driver = driver.ConvertFonts()
+			}).ConvertFonts()
 	case VerifyTypeMath:
 		c.driver = base64Captcha.NewDriverMath(
 			c.options.Height,
