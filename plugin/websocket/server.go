@@ -191,7 +191,7 @@ package websocket
 //	return found
 //}
 //
-//// Join joins a websocket client to a room,
+//// Join join a websocket client to a room,
 //// first parameter is the room name and the second the connection.ID()
 ////
 //// You can use connection.Join("room name") instead.

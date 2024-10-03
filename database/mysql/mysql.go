@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/leor-w/kid/database/repos/join"
+
 	"github.com/leor-w/injector"
 
 	"gorm.io/gorm/logger"
@@ -150,6 +152,15 @@ func Wheres(wheres ...*where.Where) func(db *gorm.DB) *gorm.DB {
 				continue
 			}
 			db.Where(format, vals...)
+		}
+		return db
+	}
+}
+
+func Joins(joins ...join.Join) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		for _, v := range joins {
+			db.Joins(v.Build())
 		}
 		return db
 	}

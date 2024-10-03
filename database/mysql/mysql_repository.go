@@ -131,7 +131,10 @@ func (repo *Repository) GetByKV(kv map[string]interface{}, model interface{}) er
 }
 
 func (repo *Repository) Find(finder *finder.Finder) error {
-	db := repo.DB.Scopes(Wheres(finder.Wheres.Wheres...))
+	var db = repo.DB.DB
+	if finder.Wheres != nil && len(finder.Wheres.Wheres) > 0 {
+		db.Scopes(Wheres(finder.Wheres.Wheres...))
+	}
 	if finder.Debug {
 		db.Debug()
 	}
