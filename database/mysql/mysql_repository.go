@@ -3,6 +3,7 @@ package mysql
 import (
 	"context"
 	"errors"
+	"reflect"
 
 	"github.com/leor-w/kid/database/repos"
 	"github.com/leor-w/kid/database/repos/creator"
@@ -282,4 +283,8 @@ func (repo *Repository) Sum(sum *finder.Sum) error {
 		return err
 	}
 	return nil
+}
+
+func (repo *Repository) GetTableName(data any) string {
+	return repo.DB.DB.NamingStrategy.TableName(reflect.TypeOf(data).Name())
 }

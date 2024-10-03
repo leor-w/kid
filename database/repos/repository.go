@@ -35,6 +35,7 @@ type (
 		GetUniqueID(finder *finder.Finder, min, max, ignoreStart, ignoreEnd int64) int64
 		Count(*finder.Finder) error
 		Sum(*finder.Sum) error
+		GetTableName(data any) string
 	}
 	// ITxRepository MySQL事务
 	ITxRepository interface {
