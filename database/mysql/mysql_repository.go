@@ -133,27 +133,27 @@ func (repo *Repository) GetByKV(kv map[string]interface{}, model interface{}) er
 func (repo *Repository) Find(finder *finder.Finder) error {
 	var db = repo.DB.DB
 	if finder.Wheres != nil && len(finder.Wheres.Wheres) > 0 {
-		db.Scopes(Wheres(finder.Wheres.Wheres...))
+		db = db.Scopes(Wheres(finder.Wheres.Wheres...))
 	}
 	if finder.Debug {
-		db.Debug()
+		db = db.Debug()
 	}
 	if finder.Model != nil {
-		db.Model(finder.Model)
+		db = db.Model(finder.Model)
 	}
 	if finder.OrderBy != "" {
-		db.Order(finder.OrderBy)
+		db = db.Order(finder.OrderBy)
 	}
 	if len(finder.Preloads) > 0 {
 		for _, preload := range finder.Preloads {
-			db.Preload(preload)
+			db = db.Preload(preload)
 		}
 	}
 	if len(finder.Scopes) > 0 {
-		db.Scopes(finder.Scopes...)
+		db = db.Scopes(finder.Scopes...)
 	}
 	if finder.Unscoped {
-		db.Unscoped()
+		db = db.Unscoped()
 	}
 	if finder.Total != nil {
 		if err := db.Count(finder.Total).Error; err != nil {
@@ -161,7 +161,7 @@ func (repo *Repository) Find(finder *finder.Finder) error {
 		}
 	}
 	if finder.Size > 0 {
-		db.Scopes(Paginate(finder.Num, finder.Size))
+		db = db.Scopes(Paginate(finder.Num, finder.Size))
 	}
 	if err := db.Find(finder.Recipient).Error; err != nil {
 		return repo.handleErr(finder.IgnoreNotFound, err)
