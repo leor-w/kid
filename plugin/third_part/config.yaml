@@ -1,0 +1,31 @@
+third_part:
+  apple:
+    key: "apple_private_key" // oath 的key
+    secret: "apple_secret"  // oath 的密钥
+    scope_name: "apple_scope_name" // oath 的scope 名称
+    scope_email: "apple_scope_email" // oath 的 scope 邮箱
+    callback_url: "apple_callback_url" // oath 的回调地址
+  google:
+    key: "google_client_id"
+    secret: "google_client_secret"
+    callback_url: "google_callback_url"
+  google_plus:
+    key: "google_plus_client_id"
+    secret: "google_plus_client_secret"
+    callback_url: "google_plus_callback_url"
+  github:
+    key: "github_client_id"
+    secret: "github_client_secret"
+    callback_url: "github_callback_url"
+  facebook:
+    key: "facebook_client_id"
+    secret: "facebook
+    callback_url: "facebook_callback_url"
+  tiktok:
+    key: "tiktok_client_id"
+    secret: "tiktok_client_secret"
+    callback_url: "tiktok_callback_url"
+  twitterv2:
+    key: "twitter_client_id"
+    secret: "twitter_client_secret"
+    callback_url: "twitter_callback_url"
