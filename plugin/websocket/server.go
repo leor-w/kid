@@ -175,7 +175,7 @@ package websocket
 //   connection actions, same as the connection's method,
 //    but these methods accept the connection ID,
 //    which is useful when the developer maps
-//    this id with a database field (using config.IDGenerator).
+//    this id with a database field (using config.yaml.IDGenerator).
 //*/
 //
 //// OnConnection is the main event you, as developer, will work with each of the websocket connections.

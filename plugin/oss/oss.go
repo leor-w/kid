@@ -4,10 +4,6 @@ import (
 	"archive/zip"
 	"context"
 	"fmt"
-	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"github.com/leor-w/injector"
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/utils"
 	"io"
 	"mime/multipart"
 	"os"
@@ -15,6 +11,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/leor-w/injector"
+	"github.com/leor-w/kid/config"
+	"github.com/leor-w/kid/utils"
 )
 
 type OSS struct {
@@ -28,7 +29,7 @@ func (alioss *OSS) Provide(ctx context.Context) interface{} {
 	}
 	confPrefix := fmt.Sprintf("oss%s", confName)
 	if !config.Exist(confPrefix) {
-		panic(fmt.Sprintf("config file not found configuration item [%s]", confPrefix))
+		panic(fmt.Sprintf("config.yaml file not found configuration item [%s]", confPrefix))
 	}
 	return New(
 		WithEndpoint(config.GetString(utils.GetConfigurationItem(confPrefix, "endpoint"))),

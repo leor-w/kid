@@ -1,0 +1,8 @@
+oauth2:
+  apple:
+    client_id: "apple_client_id"
+    team_id: "apple_team_id"
+    client_key: "apple_client_key"
+    client_secret: "apple_client_secret"
+    client_secret_file: "apple_client_secret_file" # 与 Google Cloud Console 中的 OAuth 2.0 客户端 ID 中的客户端密钥文件一致
+    redirect_url: "apple_redirect_url" # 与 Google Cloud Console 中的 OAuth 2.0 客户端 ID 中的授权回调 URL 一致

@@ -33,7 +33,7 @@ func (local *viperLocal) OnWatch(watching func()) error {
 
 func (local *viperLocal) Unmarshal(key string, receiver interface{}) error {
 	if utils.IsNilPointer(receiver) {
-		return errors.New("config.local.Unmarshal: unmarshal receiver mast not be a nil-pointer")
+		return errors.New("config.yaml.local.Unmarshal: unmarshal receiver mast not be a nil-pointer")
 	}
 	return local.Viper.UnmarshalKey(key, &receiver)
 }
@@ -45,7 +45,7 @@ func (local *viperLocal) Exist(key string) bool {
 func New(opts ...Option) *viperLocal {
 	conf := &viperLocal{
 		options: &Options{
-			configName: "config",
+			configName: "config.yaml",
 			configPath: "./",
 			configType: "yaml",
 		},

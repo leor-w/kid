@@ -29,7 +29,7 @@ func (e *Ed25519) Provide(ctx context.Context) interface{} {
 	}
 	confPrefix := fmt.Sprintf("crypt.ed25519%s", confName)
 	if !config.Exist(confPrefix) {
-		panic(fmt.Sprintf("config file not found configuration item [%s]", confPrefix))
+		panic(fmt.Sprintf("config.yaml file not found configuration item [%s]", confPrefix))
 	}
 	return NewEd25519(
 		WithEd25519PrivateKey(config.GetString(utils.GetConfigurationItem(confPrefix, "privateKey"))),

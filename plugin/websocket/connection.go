@@ -245,7 +245,7 @@ package websocket
 //		server:                   s,
 //	}
 //
-//	if s.config.BinaryMessages {
+//	if s.config.yaml.BinaryMessages {
 //		c.messageType = websocket.BinaryMessage
 //	}
 //
@@ -267,7 +267,7 @@ package websocket
 //	// for any-case the app tries to write from different goroutines,
 //	// we must protect them because they're reporting that as bug...
 //	c.writerMu.Lock()
-//	if writeTimeout := c.server.config.WriteTimeout; writeTimeout > 0 {
+//	if writeTimeout := c.server.config.yaml.WriteTimeout; writeTimeout > 0 {
 //		// set the write deadline based on the configuration
 //		c.underline.SetWriteDeadline(time.Now().Add(writeTimeout))
 //	}
@@ -314,7 +314,7 @@ package websocket
 //	go func() {
 //		for {
 //			// using sleep avoids the ticker error that causes a memory leak
-//			time.Sleep(c.server.config.PingPeriod)
+//			time.Sleep(c.server.config.yaml.PingPeriod)
 //			if c.disconnected {
 //				// verifies if already disconected
 //				break
@@ -347,12 +347,12 @@ package websocket
 //
 //func (c *connection) startReader() {
 //	conn := c.underline
-//	hasReadTimeout := c.server.config.ReadTimeout > 0
+//	hasReadTimeout := c.server.config.yaml.ReadTimeout > 0
 //
-//	conn.SetReadLimit(c.server.config.MaxMessageSize)
+//	conn.SetReadLimit(c.server.config.yaml.MaxMessageSize)
 //	conn.SetPongHandler(func(s string) error {
 //		if hasReadTimeout {
-//			conn.SetReadDeadline(time.Now().Add(c.server.config.ReadTimeout))
+//			conn.SetReadDeadline(time.Now().Add(c.server.config.yaml.ReadTimeout))
 //		}
 //		//fire all OnPong methods
 //		go c.fireOnPong()
@@ -367,7 +367,7 @@ package websocket
 //	for {
 //		if hasReadTimeout {
 //			// set the read deadline based on the configuration
-//			conn.SetReadDeadline(time.Now().Add(c.server.config.ReadTimeout))
+//			conn.SetReadDeadline(time.Now().Add(c.server.config.yaml.ReadTimeout))
 //		}
 //
 //		_, data, err := conn.ReadMessage()
@@ -387,7 +387,7 @@ package websocket
 //// messageReceived checks the incoming message and fire the nativeMessage listeners or the event listeners (ws custom message)
 //func (c *connection) messageReceived(data []byte) {
 //
-//	if bytes.HasPrefix(data, c.server.config.EvtMessagePrefix) {
+//	if bytes.HasPrefix(data, c.server.config.yaml.EvtMessagePrefix) {
 //		//it's a custom ws message
 //		receivedEvt := c.server.messageSerializer.getWebsocketCustomEvent(data)
 //		listeners, ok := c.onEventListeners[string(receivedEvt)]

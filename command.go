@@ -91,7 +91,7 @@ func (kid *Kid) NewDbCommand() *cobra.Command {
 				syscall.Exit(1)
 			}
 			kid.Options.AutoMigrate = migrate
-			conf, err := cmd.Flags().GetString("config")
+			conf, err := cmd.Flags().GetString("config.yaml")
 			if err != nil {
 				panic(fmt.Sprintf("读取配置文件错误: %s", err.Error()))
 			}
@@ -146,7 +146,7 @@ func (kid *Kid) NewDbCommand() *cobra.Command {
 	}
 	dbCmd.Flags().BoolP("automigrate", "m", false, "进行数据库迁移操作, 此操作将会同步项目中注册的 models 到数据库表")
 	dbCmd.Flags().BoolP("closefkcheck", "f", false, "是否关闭外键检查")
-	dbCmd.Flags().StringP("config", "c", "", "指定配置文件")
+	dbCmd.Flags().StringP("config.yaml", "c", "", "指定配置文件")
 	dbCmd.Flags().StringP("database", "n", "", "需要同步的库")
 	dbCmd.Flags().StringP("address", "a", "", "数据库连接地址")
 	dbCmd.Flags().IntP("port", "i", 3306, "数据库连接端口")
@@ -162,7 +162,7 @@ func (kid *Kid) NewServerCommand() *cobra.Command {
 		Short: "服务启动相关命令",
 		Long:  "使用该指令可以指定启动的配置文件等选项",
 		Run: func(cmd *cobra.Command, args []string) {
-			confs, err := cmd.Flags().GetStringSlice("config")
+			confs, err := cmd.Flags().GetStringSlice("config.yaml")
 			if err != nil {
 				panic(fmt.Sprintf("服务启动错误: 解析手动指定配置文件错误: %s", err.Error()))
 			}
@@ -172,7 +172,7 @@ func (kid *Kid) NewServerCommand() *cobra.Command {
 		},
 		SilenceErrors: true,
 	}
-	srvCmd.Flags().StringSliceP("config", "c", []string{}, "服务启动的 yaml 配置文件，多个配置文件可以使用 ',' 分隔(默认为 ./conf/config.yaml)")
+	srvCmd.Flags().StringSliceP("config.yaml", "c", []string{}, "服务启动的 yaml 配置文件，多个配置文件可以使用 ',' 分隔(默认为 ./conf/config.yaml.yaml)")
 	return srvCmd
 }
 

@@ -95,7 +95,7 @@ func (ws *Websocket) Provide(ctx context.Context) interface{} {
 	}
 	confPrefix := fmt.Sprintf("websocket%s", confName)
 	if !config.Exist(confPrefix) {
-		panic(fmt.Sprintf("config file not found configuration item [%s]", confPrefix))
+		panic(fmt.Sprintf("config.yaml file not found configuration item [%s]", confPrefix))
 	}
 	bufferPool, _ := ctx.Value(BufferPoolKey{}).(websocket.BufferPool)
 	errorFunc, _ := ctx.Value(ErrorKey{}).(func(w http.ResponseWriter, r *http.Request, status int, reason error))

@@ -127,7 +127,7 @@ func NewLogger(opts ...logger.Option) *logrusLogger {
 func Default(name string) logger.Logger {
 	confPrefix := utils.GetConfigurationItem("logger", name)
 	if !config.Exist(confPrefix) {
-		panic(fmt.Sprintf("config not found configuration item [%s]", confPrefix))
+		panic(fmt.Sprintf("config.yaml not found configuration item [%s]", confPrefix))
 	}
 	log := NewLogger(
 		WithFormatter(formatters.NewSimpleFormatter()),

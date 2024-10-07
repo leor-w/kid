@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	engin := kid.New(kid.WithConfigs("./config.yaml"))
+	engin := kid.New(kid.WithConfigs("./config.yaml.yaml"))
 	engin.GET("", func(ctx *kid.Context) interface{} {
 		fmt.Println(1)
 		return gin.H{"hello": "world"}

@@ -29,7 +29,7 @@ func (ali *Ali) Provide(ctx context.Context) interface{} {
 	}
 	confPrefix := fmt.Sprintf("aliyun%s", configName)
 	if !config.Exist(fmt.Sprintf(confPrefix)) {
-		panic(fmt.Sprintf("config file not found configuration item [%s]", confPrefix))
+		panic(fmt.Sprintf("config.yaml file not found configuration item [%s]", confPrefix))
 	}
 	return NewAliSMS(
 		WithAccessKeyId(config.GetString(utils.GetConfigurationItem(confPrefix, "accessKeyId"))),

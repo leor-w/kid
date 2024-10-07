@@ -22,7 +22,7 @@ func (remote *viperRemote) Get(key string) interface{} {
 
 func (remote *viperRemote) ReadConfig() error {
 	if err := remote.ReadRemoteConfig(); err != nil {
-		return fmt.Errorf("config.remote.ReadConfig: read config failed: %w", err)
+		return fmt.Errorf("config.yaml.remote.ReadConfig: read config.yaml failed: %w", err)
 	}
 	return nil
 }
@@ -30,7 +30,7 @@ func (remote *viperRemote) ReadConfig() error {
 func (remote *viperRemote) Unmarshal(key string, receiver interface{}) error {
 	iv := reflect.ValueOf(receiver)
 	if iv.Kind() != reflect.Ptr || iv.IsNil() {
-		return errors.New("config.remote.Unmarshal: unmarshal receiver mast not be a nil-pointer")
+		return errors.New("config.yaml.remote.Unmarshal: unmarshal receiver mast not be a nil-pointer")
 	}
 	return remote.Viper.UnmarshalKey(key, receiver)
 }

@@ -32,7 +32,7 @@ func (c *Captcha) Provide(ctx context.Context) interface{} {
 	}
 	confPrefix := fmt.Sprintf("captcha%s", confName)
 	if !config.Exist(confPrefix) {
-		panic(fmt.Sprintf("config file not found configuration item [%s]", confPrefix))
+		panic(fmt.Sprintf("config.yaml file not found configuration item [%s]", confPrefix))
 	}
 	return New(
 		WithEngine(VerifyType(config.GetInt(utils.GetConfigurationItem(confPrefix, "engine")))),

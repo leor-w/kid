@@ -2,10 +2,11 @@ package test
 
 import (
 	"fmt"
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/config/local"
 	"testing"
 	"time"
+
+	"github.com/leor-w/kid/config"
+	"github.com/leor-w/kid/config/local"
 )
 
 type Test struct {
@@ -14,7 +15,7 @@ type Test struct {
 
 func TestLocalConfig(t *testing.T) {
 	lProvider := local.New(
-		local.WithConfigName("config"),
+		local.WithConfigName("config.yaml"),
 		local.WithConfigPath("./"),
 		local.WithConfigType("yaml"),
 	)

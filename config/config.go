@@ -155,7 +155,7 @@ func New(opts ...Option) *Config {
 }
 
 func Default() *Config {
-	defaultConfig = New(WithProviders([]string{"./config.yaml"}))
+	defaultConfig = New(WithProviders([]string{"./config.yaml.yaml"}))
 	return defaultConfig
 }
 

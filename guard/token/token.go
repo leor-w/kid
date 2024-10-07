@@ -26,7 +26,7 @@ func (token *Token) Provide(ctx context.Context) interface{} {
 	}
 	confPrefix := fmt.Sprintf("token%s", confName)
 	if !config.Exist(confPrefix) {
-		panic(fmt.Sprintf("config file not found configuration item [%s]", confPrefix))
+		panic(fmt.Sprintf("config.yaml file not found configuration item [%s]", confPrefix))
 	}
 	defaultToken = New(
 		WithSecret(config.GetString(utils.GetConfigurationItem(confPrefix, "secret"))),

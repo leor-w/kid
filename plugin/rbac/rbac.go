@@ -47,7 +47,7 @@ func (ctrl *Controller) Provide(ctx context.Context) interface{} {
 	}
 	confPrefix := fmt.Sprintf("rbac%s", confName)
 	if !config.Exist(confPrefix) {
-		panic(fmt.Sprintf("config file not found configuration item [%s]", confPrefix))
+		panic(fmt.Sprintf("config.yaml file not found configuration item [%s]", confPrefix))
 	}
 	defaultRbac = New(
 		WithModelConf(config.GetString(utils.GetConfigurationItem(confPrefix, "model"))),
