@@ -3,7 +3,9 @@ package crypt
 import (
 	"context"
 	"crypto/ed25519"
+	"crypto/rand"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"os"
@@ -37,6 +39,14 @@ func (e *Ed25519) Provide(ctx context.Context) interface{} {
 		WithEd25519PublicKey(config.GetString(utils.GetConfigurationItem(confPrefix, "publicKey"))),
 		WithEd25519PublicKeyFile(config.GetString(utils.GetConfigurationItem(confPrefix, "publicKeyFile"))),
 	)
+}
+
+func (e *Ed25519) GenKeyPair() ([]byte, []byte, error) {
+	privateKey, publicKey, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		return nil, nil, fmt.Errorf("生成密钥对失败: %s", err.Error())
+	}
+	return []byte(hex.EncodeToString(privateKey)), []byte(hex.EncodeToString(publicKey)), nil
 }
 
 func (e *Ed25519) Init() error {
