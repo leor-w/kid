@@ -3,7 +3,6 @@ package awss3
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/credentials"
 
@@ -42,15 +41,11 @@ func (aws *AwsS3) Provide(ctx context.Context) any {
 	)
 }
 
-func (aws *AwsS3) GeneratePresignedURL(bucketName, key string, expireTime time.Duration) (string, error) {
-	req, err := aws.presignClient.PresignGetObject(context.TODO(), &s3.GetObjectInput{
-		Bucket: &bucketName,
-		Key:    &key,
-	}, s3.WithPresignExpires(expireTime))
-	if err != nil {
-		return "", fmt.Errorf("生成预签名URL失败: %v", err)
+func (aws *AwsS3) GetPreSignClient() *s3.PresignClient {
+	if aws.presignClient == nil {
+		aws.presignClient = s3.NewPresignClient(aws.s3Client)
 	}
-	return req.URL, nil
+	return aws.presignClient
 }
 
 func NewAwsS3(options ...Option) *AwsS3 {
