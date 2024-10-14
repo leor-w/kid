@@ -44,6 +44,10 @@ func (r *Rsa) Provide(ctx context.Context) interface{} {
 	)
 }
 
+func (r *Rsa) GenKeyPair() ([]byte, []byte, error) {
+	return nil, nil, nil
+}
+
 func (r *Rsa) Init() error {
 	pubKey, err := r.LoadPublicKey()
 	if err != nil {
