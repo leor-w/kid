@@ -34,7 +34,7 @@ func (r *Rsa) Provide(ctx context.Context) interface{} {
 	}
 	confPrefix := fmt.Sprintf("rsa%s", confName)
 	if !config.Exist(confPrefix) {
-		panic(fmt.Sprintf("config.yaml file not found configuration item [%s]", confPrefix))
+		panic(fmt.Sprintf("配置文件未找到配置项 [%s]", confPrefix))
 	}
 	return NewRsa(
 		WithPrivateKey(config.GetString(utils.GetConfigurationItem(confPrefix, "privateKey"))),

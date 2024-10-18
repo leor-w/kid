@@ -5,12 +5,34 @@ import (
 	"fmt"
 
 	redis2 "github.com/go-redis/redis/v8"
+	"github.com/leor-w/injector"
+
+	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/database/redis"
+	"github.com/leor-w/kid/utils"
 )
 
 type RateLimit struct {
-	rdb     *redis.Client
+	rdb     *redis.Client `inject:""`
 	options *Options
+}
+
+type Option func(*Options)
+
+func (r *RateLimit) Provide(ctx context.Context) any {
+	var confName string
+	if name, ok := ctx.Value(injector.NameKey{}).(string); ok && len(name) > 0 {
+		confName = "." + name
+	}
+	confPrefix := fmt.Sprintf("rsa%s", confName)
+	if !config.Exist(confPrefix) {
+		panic(fmt.Sprintf("配置文件未找到配置项 [%s]", confPrefix))
+	}
+	return New(
+		WithRateLimit(config.GetInt(utils.GetConfigurationItem(confPrefix, "rate_limit"))),
+		WithBurstLimit(config.GetInt(utils.GetConfigurationItem(confPrefix, "burst_limit"))),
+		WithRateLimitWindow(config.GetInt(utils.GetConfigurationItem(confPrefix, "rate_limit_window"))),
+	)
 }
 
 func (r *RateLimit) RateLimit(key string) (bool, error) {
@@ -35,4 +57,16 @@ func (r *RateLimit) RateLimit(key string) (bool, error) {
 	return true, nil
 }
 
-type Option func(*Options)
+func New(options ...Option) *RateLimit {
+	var opts = &Options{
+		RateLimit:       5,
+		BurstLimit:      10,
+		RateLimitWindow: 60,
+	}
+	for _, option := range options {
+		option(opts)
+	}
+	return &RateLimit{
+		options: opts,
+	}
+}
