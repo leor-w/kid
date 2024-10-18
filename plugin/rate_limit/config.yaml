@@ -1,0 +1,4 @@
+rate_limit:
+  rate_limit: 10 # 每秒允许的最大请求数
+  burst_limit: 20 # 最大突发请求数
+  rate_limit_window: 60 # 限流窗口时间,单位秒
