@@ -24,7 +24,7 @@ func (r *RateLimit) Provide(ctx context.Context) any {
 	if name, ok := ctx.Value(injector.NameKey{}).(string); ok && len(name) > 0 {
 		confName = "." + name
 	}
-	confPrefix := fmt.Sprintf("rsa%s", confName)
+	confPrefix := fmt.Sprintf("rate_limit%s", confName)
 	if !config.Exist(confPrefix) {
 		panic(fmt.Sprintf("配置文件未找到配置项 [%s]", confPrefix))
 	}
