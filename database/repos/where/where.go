@@ -53,6 +53,19 @@ func Or() *Wheres {
 	}
 }
 
+func (w *Wheres) And() *Wheres {
+	return &Wheres{
+		Wheres: make([]*Where, 0),
+	}
+}
+
+func (w *Wheres) Or() *Wheres {
+	return &Wheres{
+		Wheres: make([]*Where, 0),
+		isOr:   true,
+	}
+}
+
 func (w *Wheres) add(where *Where) *Wheres {
 	w.Wheres = append(w.Wheres, where)
 	return w
