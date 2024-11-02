@@ -15,7 +15,7 @@ type MultipartUploadPreSignConfig struct {
 }
 
 type CompleteMultipartUploadConfig struct {
-	bucket      string
+	Bucket      string
 	UploadId    string         // 上传ID
 	ObjectKey   string         // 对象名称
 	ContentType string         // 文件类型
