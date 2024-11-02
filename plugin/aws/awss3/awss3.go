@@ -148,7 +148,7 @@ func (awsS3 *AwsS3) CompleteMultipartUpload(conf *CompleteMultipartUploadConfig)
 		}
 	}
 	input := &s3.CompleteMultipartUploadInput{
-		Bucket:          aws.String(conf.bucket),
+		Bucket:          aws.String(conf.Bucket),
 		Key:             aws.String(conf.ObjectKey),
 		UploadId:        aws.String(conf.UploadId),
 		MultipartUpload: &types.CompletedMultipartUpload{Parts: completedParts},
