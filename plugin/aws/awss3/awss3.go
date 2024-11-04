@@ -34,7 +34,7 @@ func (awsS3 *AwsS3) Provide(ctx context.Context) any {
 	if ok && len(name) > 0 {
 		confName = "." + name
 	}
-	confPrefix := fmt.Sprintf("awsS3.s3%s", confName)
+	confPrefix := fmt.Sprintf("aws.s3%s", confName)
 	if !config.Exist(confPrefix) {
 		panic(fmt.Sprintf("配置文件为找到 [%s.*]，请检查配置文件", confPrefix))
 	}

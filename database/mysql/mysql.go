@@ -5,19 +5,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/leor-w/kid/database/repos/join"
-
-	"github.com/leor-w/injector"
-
-	"gorm.io/gorm/logger"
-
-	"github.com/leor-w/kid/database/repos/where"
-
 	"github.com/leor-w/kid/config"
+	"github.com/leor-w/kid/database/repos/join"
+	"github.com/leor-w/kid/database/repos/where"
 	"github.com/leor-w/kid/utils"
 
+	"github.com/leor-w/injector"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type MySQL struct {
