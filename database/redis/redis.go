@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"time"
 
@@ -40,6 +41,7 @@ func (cli *Client) Provide(ctx context.Context) interface{} {
 		WithCtxTimeout(config.GetDuration(utils.GetConfigurationItem(confPrefix, "ctxTimeout"))),
 		WithPoolSize(config.GetInt(utils.GetConfigurationItem(confPrefix, "poolSize"))),
 		WithMinIdle(config.GetInt(utils.GetConfigurationItem(confPrefix, "minIdleConn"))),
+		WithTLS(config.GetBool(utils.GetConfigurationItem(confPrefix, "tls"))),
 	)
 }
 
@@ -64,6 +66,12 @@ func New(opts ...Option) *Client {
 	cli := &Client{
 		options: options,
 	}
+	var tlsConfig *tls.Config
+	if options.TLS {
+		tlsConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+	}
 	cli.Client = redis.NewClient(&redis.Options{
 		Addr:         cli.options.Addr,
 		Password:     cli.options.Password,
@@ -76,6 +84,7 @@ func New(opts ...Option) *Client {
 		MaxConnAge:   cli.options.MaxConnAge,
 		PoolTimeout:  cli.options.PoolTimeout,
 		IdleTimeout:  cli.options.IdleTimeout,
+		TLSConfig:    tlsConfig,
 	})
 	if err := cli.Ping().Err(); err != nil {
 		panic(fmt.Sprintf("ping redis failed: %s", err.Error()))

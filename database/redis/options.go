@@ -15,6 +15,7 @@ type Options struct {
 	CtxTimeout   time.Duration
 	PoolSize     int
 	MinIdleConn  int
+	TLS          bool
 }
 
 func WithAddr(addr string) Option {
@@ -86,5 +87,11 @@ func WithMinIdle(minIdle int) Option {
 func WithMaxConnAge(maxConnAge time.Duration) Option {
 	return func(o *Options) {
 		o.MaxConnAge = maxConnAge * time.Hour
+	}
+}
+
+func WithTLS(tls bool) Option {
+	return func(o *Options) {
+		o.TLS = tls
 	}
 }

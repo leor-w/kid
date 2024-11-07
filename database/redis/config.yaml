@@ -11,6 +11,7 @@ redis:
   poolSize: 50
   minIdleConn: 10
   ctxTimeout: 3 # second
+  tls: false
 
 redisCluster:
   addrs: ["http://127.0.0.1:6379", "http://127.0.0.1:6380", "http:127.0.0.1:6381"] # 连接地址
@@ -25,3 +26,4 @@ redisCluster:
   poolSize: 50 # 连接池最大链接数
   minIdleConn: 10 # 最小空闲链接数
   ctxTimeout: 3 # second
+  tls: false
