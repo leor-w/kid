@@ -137,6 +137,20 @@ func (awsS3 *AwsS3) GetMultipartUploadPreSignURL(conf *MultipartUploadPreSignCon
 	return req.URL, nil
 }
 
+// AbortMultipartUpload 取消分片上传
+func (awsS3 *AwsS3) AbortMultipartUpload(conf *CancelMultipartUploadConfig) error {
+	_, err := awsS3.Client().AbortMultipartUpload(context.TODO(), &s3.AbortMultipartUploadInput{
+		Bucket:              aws.String(conf.Bucket),
+		Key:                 aws.String(conf.ObjectKey),
+		UploadId:            aws.String(conf.UploadId),
+		ExpectedBucketOwner: aws.String(conf.ExpectedBucketOwner),
+	})
+	if err != nil {
+		return fmt.Errorf("取消分片上传失败: %v", err)
+	}
+	return nil
+}
+
 // CompleteMultipartUpload 完成分片上传, 将会合并所有分片
 // conf 包含了完成分片上传所需的参数
 func (awsS3 *AwsS3) CompleteMultipartUpload(conf *CompleteMultipartUploadConfig) error {

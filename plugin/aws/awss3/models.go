@@ -14,6 +14,13 @@ type MultipartUploadPreSignConfig struct {
 	Expires    time.Duration // 预签名URL过期时间
 }
 
+type CancelMultipartUploadConfig struct {
+	Bucket              string
+	ObjectKey           string
+	UploadId            string
+	ExpectedBucketOwner string
+}
+
 type CompleteMultipartUploadConfig struct {
 	Bucket      string
 	UploadId    string         // 上传ID
