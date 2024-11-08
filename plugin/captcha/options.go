@@ -24,6 +24,13 @@ type Options struct {
 	NoiseCount           int
 	BgColor              string
 	Audio                Audio
+	Digit                // 数字验证码
+}
+
+type Digit struct {
+	Length   int
+	MaxSkew  float64
+	DotCount int
 }
 
 type Audio struct {
@@ -108,4 +115,22 @@ func (o *Options) GetShowLine() int {
 		optionShowLine |= base64Captcha.OptionShowSineLine
 	}
 	return optionShowLine
+}
+
+func WithDigitLength(length int) Option {
+	return func(o *Options) {
+		o.Digit.Length = length
+	}
+}
+
+func WithDigitMaxSkew(maxSkew float64) Option {
+	return func(o *Options) {
+		o.Digit.MaxSkew = maxSkew
+	}
+}
+
+func WithDigitDotCount(dotCount int) Option {
+	return func(o *Options) {
+		o.Digit.DotCount = dotCount
+	}
 }

@@ -10,3 +10,7 @@ captcha:
   bgColor: #000000
   audio:
     language: en # 验证码语言类型
+  digit:
+    length: 5 # 数字验证码长度
+    maxSkew: 0.7 # 最大倾斜度 0~1 之间的小数
+    dotCount: 100 # 点的数量 0~100 之间的整数

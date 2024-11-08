@@ -45,6 +45,9 @@ func (c *Captcha) Provide(ctx context.Context) interface{} {
 		WithNoiseCount(config.GetInt(utils.GetConfigurationItem(confPrefix, "noiseCount"))),
 		WithBgColor(config.GetString(utils.GetConfigurationItem(confPrefix, "bgColor"))),
 		WithLanguage(config.GetString(utils.GetConfigurationItem(confPrefix, "audio.language"))),
+		WithDigitLength(config.GetInt(utils.GetConfigurationItem(confPrefix, "digit.length"))),
+		WithDigitMaxSkew(config.GetFloat(utils.GetConfigurationItem(confPrefix, "digit.maxSkew"))),
+		WithDigitDotCount(config.GetInt(utils.GetConfigurationItem(confPrefix, "digit.dotCount"))),
 	)
 }
 
@@ -156,7 +159,13 @@ func (c *Captcha) Init() error {
 			nil,
 		)
 	case VerifyTypeDigit:
-		c.driver = base64Captcha.DefaultDriverDigit
+		c.driver = base64Captcha.NewDriverDigit(
+			c.options.Height,
+			c.options.Width,
+			c.options.Length,
+			c.options.MaxSkew,
+			c.options.DotCount,
+		)
 	case VerifyTypeLanguage:
 		c.driver = base64Captcha.NewDriverLanguage(
 			c.options.Height,
