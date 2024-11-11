@@ -139,11 +139,15 @@ func (awsS3 *AwsS3) GetMultipartUploadPreSignURL(conf *MultipartUploadPreSignCon
 
 // AbortMultipartUpload 取消分片上传
 func (awsS3 *AwsS3) AbortMultipartUpload(conf *CancelMultipartUploadConfig) error {
+	var owner *string
+	if len(conf.ExpectedBucketOwner) > 0 {
+		owner = &conf.ExpectedBucketOwner
+	}
 	_, err := awsS3.Client().AbortMultipartUpload(context.TODO(), &s3.AbortMultipartUploadInput{
 		Bucket:              aws.String(conf.Bucket),
 		Key:                 aws.String(conf.ObjectKey),
 		UploadId:            aws.String(conf.UploadId),
-		ExpectedBucketOwner: aws.String(conf.ExpectedBucketOwner),
+		ExpectedBucketOwner: owner,
 	})
 	if err != nil {
 		return fmt.Errorf("取消分片上传失败: %v", err)
@@ -167,9 +171,28 @@ func (awsS3 *AwsS3) CompleteMultipartUpload(conf *CompleteMultipartUploadConfig)
 		UploadId:        aws.String(conf.UploadId),
 		MultipartUpload: &types.CompletedMultipartUpload{Parts: completedParts},
 	}
-	_, err := awsS3.Client().CompleteMultipartUpload(context.TODO(), input)
-	if err != nil {
+	if _, err := awsS3.Client().CompleteMultipartUpload(context.TODO(), input); err != nil {
 		return fmt.Errorf("完成分片上传失败: %v", err)
+	}
+	return nil
+}
+
+func (awsS3 *AwsS3) DeleteFile(conf *DeleteObjectConfig) error {
+	var owner *string
+	if len(conf.ExpectedBucketOwner) > 0 {
+		owner = &conf.ExpectedBucketOwner
+	}
+	var versionId *string
+	if len(conf.VersionId) > 0 {
+		versionId = &conf.VersionId
+	}
+	if _, err := awsS3.Client().DeleteObject(context.TODO(), &s3.DeleteObjectInput{
+		Bucket:              aws.String(conf.Bucket),
+		Key:                 aws.String(conf.ObjectKey),
+		ExpectedBucketOwner: owner,
+		VersionId:           versionId,
+	}); err != nil {
+		return fmt.Errorf("删除文件失败: %v", err)
 	}
 	return nil
 }

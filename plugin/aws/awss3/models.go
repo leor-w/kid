@@ -29,6 +29,13 @@ type CompleteMultipartUploadConfig struct {
 	Parts       []CompletePart // 分片列表
 }
 
+type DeleteObjectConfig struct {
+	Bucket              string
+	ObjectKey           string
+	ExpectedBucketOwner string
+	VersionId           string
+}
+
 type CompletePart struct {
 	PartNumber int32  // 分片编号
 	ETag       string // 分片的ETag
