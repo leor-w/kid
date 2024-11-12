@@ -19,6 +19,12 @@ type Deleter struct {
 	// 是否开启调试模式
 	Debug bool
 
+	// 关联
+	Associations []string
+
+	// 是否关联所有
+	IsAssociationsAll bool
+
 	// 条件
 	Wheres *where.Wheres
 }

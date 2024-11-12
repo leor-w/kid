@@ -5,6 +5,8 @@ import (
 	"errors"
 	"reflect"
 
+	"gorm.io/gorm/clause"
+
 	"github.com/leor-w/kid/database/repos"
 	"github.com/leor-w/kid/database/repos/creator"
 	"github.com/leor-w/kid/database/repos/deleter"
@@ -222,6 +224,12 @@ func (repo *Repository) Delete(deleter *deleter.Deleter) error {
 	var db = repo.getTx(deleter.Tx)
 	if deleter.Debug {
 		db.Debug()
+	}
+	if deleter.IsAssociationsAll {
+		db.Select(clause.Associations)
+	}
+	if len(deleter.Associations) > 0 {
+		db.Select(deleter.Associations)
 	}
 	return db.
 		Model(deleter.Model).
