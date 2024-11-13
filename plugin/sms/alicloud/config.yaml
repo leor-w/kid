@@ -1,5 +1,6 @@
 # 单个短信发送方式
 aliyun:
+  analog: false # 是否启用模拟发送
   accessKeyId: ""
   accessKeySecret: ""
   endpoint: ""

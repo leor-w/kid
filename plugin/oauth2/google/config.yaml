@@ -2,7 +2,7 @@ oauth2:
   google:
     client_id: "google_client_id"
     client_secret: "google_client_secret"
-    callback_url: "google_callback_url" # 与 Google Cloud Console 中的 OAuth 2.0 客户端 ID 中的授权回调 URL 一致
+    redirect_url: "google_callback_url" # 与 Google Cloud Console 中的 OAuth 2.0 客户端 ID 中的授权回调 URL 一致
     scope: # 请求的权限范围（按需获取，不需要的可以删除，保持权限最小化，减少隐私风险）
-      - "https://www.googleapis.com/auth/userinfo.email" # 获取用户邮箱
-      - "https://www.googleapis.com/auth/userinfo.profile" # 获取用户信息
+      - "email" # 获取用户邮箱
+      - "profile" # 获取用户信息

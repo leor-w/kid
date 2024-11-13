@@ -56,3 +56,7 @@ func TestCheckPhone(t *testing.T) {
 	phone := "16637196891"
 	fmt.Println(RegexpMatchPhone(phone))
 }
+
+func TestGenSMSCode(t *testing.T) {
+	fmt.Println(RandomSMSCode(6))
+}

@@ -1,11 +1,18 @@
-package smscode
+package alicloud
 
 type AliOptions struct {
+	Analog          bool
 	AccessKeyId     string
 	AccessKeySecret string
 	Endpoint        string
 	SignName        string
 	TempCode        string
+}
+
+func WithAnalog(analog bool) AliOption {
+	return func(o *AliOptions) {
+		o.Analog = analog
+	}
 }
 
 func WithAccessKeyId(accessKeyId string) AliOption {

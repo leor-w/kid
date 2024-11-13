@@ -29,7 +29,16 @@ func WithRedirectURL(redirectURL string) Option {
 }
 
 func WithScope(scope []string) Option {
+	scopes := make([]string, len(scope))
+	for _, s := range scope {
+		switch s {
+		case "email":
+			scopes = append(scopes, Email)
+		case "profile":
+			scopes = append(scopes, Profile)
+		}
+	}
 	return func(o *Options) {
-		o.Scope = scope
+		o.Scope = scopes
 	}
 }

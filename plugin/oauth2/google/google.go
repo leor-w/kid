@@ -14,6 +14,13 @@ import (
 	"github.com/leor-w/kid/utils"
 )
 
+const (
+	Profile = "https://www.googleapis.com/auth/userinfo.profile" // 获取用户信息
+	Email   = "https://www.googleapis.com/auth/userinfo.email"   // 获取用户邮箱
+)
+
+const tokenState = "random"
+
 type OAuth struct {
 	oauthConfig oauth2.Config
 	options     Options
@@ -58,6 +65,10 @@ func (auth *OAuth) HandlerAuth(code string) (*localOauth2.User, error) {
 		return nil, fmt.Errorf("解析用户信息失败: %s", err.Error())
 	}
 	return &user, nil
+}
+
+func (auth *OAuth) GetLoginURL() string {
+	return auth.oauthConfig.AuthCodeURL(utils.UUID())
 }
 
 func New(opts ...Option) *OAuth {

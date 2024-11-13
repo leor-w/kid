@@ -1,0 +1,7 @@
+twilio:
+  analog: false # 是否启用模拟发送
+  account_sid: "ACXXXXXXXX" # Twilio 的 Account SID，可在控制台中查看
+  auth_token: "XXXXXXXX" # Twilio 的 Auth Token，可在控制台中查看
+  service_sid: "MGXXXXXXXX" # Twilio 的 Service SID，可在控制台中查看
+  edge: "https://api.twilio.com" # Twilio 的 API Edge，可在控制台中查看
+  region: "us1" # Twilio 的 Region，可在控制台中查看
