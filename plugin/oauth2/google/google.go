@@ -19,7 +19,9 @@ const (
 	Email   = "https://www.googleapis.com/auth/userinfo.email"   // 获取用户邮箱
 )
 
-const tokenState = "random"
+const (
+	endpointUserInfo = "https://www.googleapis.com/oauth2/v3/userinfo"
+)
 
 type OAuth struct {
 	oauthConfig oauth2.Config
@@ -46,15 +48,19 @@ func (auth *OAuth) Provide(ctx context.Context) any {
 
 type Option func(o *Options)
 
-func (auth *OAuth) HandlerAuth(code string) (*localOauth2.User, error) {
+func (auth *OAuth) HandleAuth(code string) (*localOauth2.User, error) {
+	codeUnescape, err := utils.RecursiveURLDecode(code)
+	if err != nil {
+		return nil, fmt.Errorf("解码授权码失败: %s", err.Error())
+	}
 	// 通过授权码换取 token
-	token, err := auth.oauthConfig.Exchange(context.Background(), code)
+	token, err := auth.oauthConfig.Exchange(context.Background(), codeUnescape)
 	if err != nil {
 		return nil, fmt.Errorf("授权码换取 token 失败: %s", err.Error())
 	}
 	client := auth.oauthConfig.Client(context.Background(), token)
 	// 获取用户信息
-	userInfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	userInfo, err := client.Get(endpointUserInfo)
 	if err != nil {
 		return nil, fmt.Errorf("获取用户信息失败: %s", err.Error())
 	}
@@ -67,7 +73,7 @@ func (auth *OAuth) HandlerAuth(code string) (*localOauth2.User, error) {
 	return &user, nil
 }
 
-func (auth *OAuth) GetLoginURL() string {
+func (auth *OAuth) GetAuthPageURL() string {
 	return auth.oauthConfig.AuthCodeURL(utils.UUID())
 }
 

@@ -60,3 +60,15 @@ func TestCheckPhone(t *testing.T) {
 func TestGenSMSCode(t *testing.T) {
 	fmt.Println(RandomSMSCode(6))
 }
+
+func TestRecursiveURLDecode(t *testing.T) {
+	value := "https://baidu.com/?baidu=baidu"
+	//encodeVal := url.QueryEscape(url.QueryEscape(value))
+	encodeVal := value
+	t.Logf("Url qurey escape: %s", encodeVal)
+	decodeVal, err := RecursiveURLDecode(encodeVal)
+	if err != nil {
+		t.Errorf("RecursiveURLDecode error: %v", err)
+	}
+	t.Logf("RecursiveURLDecode: %s", decodeVal)
+}

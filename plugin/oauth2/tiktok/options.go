@@ -1,15 +1,15 @@
 package tiktok
 
 type Options struct {
-	ClientID     string
+	ClientKey    string
 	ClientSecret string
 	RedirectURL  string
 	Scope        []string
 }
 
-func WithClientID(clientID string) Option {
+func WithClientKey(clientKey string) Option {
 	return func(o *Options) {
-		o.ClientID = clientID
+		o.ClientKey = clientKey
 	}
 }
 
@@ -26,7 +26,22 @@ func WithRedirectURL(redirectURL string) Option {
 }
 
 func WithScope(scope []string) Option {
+	scopes := make([]string, 0, len(scope))
+	for _, s := range scope {
+		switch s {
+		case "basic":
+			scopes = append(scopes, UserScopeBasic)
+		case "artist_read":
+			scopes = append(scopes, UserScopeArtistRead)
+		case "artist_update":
+			scopes = append(scopes, UserScopeArtistUpdate)
+		case "profile":
+			scopes = append(scopes, UserScopeUserProfile)
+		case "stats":
+			scopes = append(scopes, UserScopeUserStats)
+		}
+	}
 	return func(o *Options) {
-		o.Scope = scope
+		o.Scope = scopes
 	}
 }
