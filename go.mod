@@ -51,7 +51,7 @@ require (
 	github.com/tidwall/gjson v1.14.4
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	github.com/wechatpay-apiv3/wechatpay-go v0.2.17
-	golang.org/x/oauth2 v0.23.0
+	golang.org/x/oauth2 v0.24.0
 	golang.org/x/sync v0.8.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/mysql v1.5.1

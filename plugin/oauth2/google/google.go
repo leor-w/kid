@@ -10,7 +10,7 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/leor-w/kid/config"
-	localOauth2 "github.com/leor-w/kid/plugin/oauth2"
+	plugin "github.com/leor-w/kid/plugin/oauth2"
 	"github.com/leor-w/kid/utils"
 )
 
@@ -30,11 +30,11 @@ type OAuth struct {
 
 func (auth *OAuth) Provide(ctx context.Context) any {
 	var confName string
-	name, ok := ctx.Value(new(injector.NameKey)).(string)
+	name, ok := ctx.Value(injector.NameKey{}).(string)
 	if ok && len(name) > 0 {
 		confName = "." + name
 	}
-	confPrefix := fmt.Sprintf("oauth2.google%s", confName)
+	confPrefix := fmt.Sprintf("oauth2%s", confName)
 	if !config.Exist(confPrefix) {
 		panic(fmt.Sprintf("配置文件为找到 [%s.*]，请检查配置文件", confPrefix))
 	}
@@ -48,8 +48,8 @@ func (auth *OAuth) Provide(ctx context.Context) any {
 
 type Option func(o *Options)
 
-func (auth *OAuth) HandleAuth(code string) (*localOauth2.User, error) {
-	codeUnescape, err := utils.RecursiveURLDecode(code)
+func (auth *OAuth) HandleAuth(code *plugin.VerifyCode) (*plugin.User, error) {
+	codeUnescape, err := utils.RecursiveURLDecode(code.Code)
 	if err != nil {
 		return nil, fmt.Errorf("解码授权码失败: %s", err.Error())
 	}
@@ -66,7 +66,7 @@ func (auth *OAuth) HandleAuth(code string) (*localOauth2.User, error) {
 	}
 	defer userInfo.Body.Close()
 	// 解析用户信息
-	var user localOauth2.User
+	var user plugin.User
 	if err := json.NewDecoder(userInfo.Body).Decode(&user); err != nil {
 		return nil, fmt.Errorf("解析用户信息失败: %s", err.Error())
 	}

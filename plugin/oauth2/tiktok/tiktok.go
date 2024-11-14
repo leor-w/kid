@@ -12,7 +12,7 @@ import (
 
 	"github.com/leor-w/kid/logger"
 
-	localOauth2 "github.com/leor-w/kid/plugin/oauth2"
+	plugin "github.com/leor-w/kid/plugin/oauth2"
 
 	"github.com/leor-w/injector"
 	"github.com/leor-w/kid/config"
@@ -28,11 +28,11 @@ type OAuth struct {
 
 func (oauth *OAuth) Provide(ctx context.Context) any {
 	var confName string
-	name, ok := ctx.Value(new(injector.NameKey)).(string)
+	name, ok := ctx.Value(injector.NameKey{}).(string)
 	if ok && len(name) > 0 {
 		confName = "." + name
 	}
-	confPrefix := fmt.Sprintf("oauth2.tiktok%s", confName)
+	confPrefix := fmt.Sprintf("oauth2%s", confName)
 	if !config.Exist(confPrefix) {
 		panic(fmt.Sprintf("配置文件为找到 [%s.*]，请检查配置文件", confPrefix))
 	}
@@ -46,13 +46,13 @@ func (oauth *OAuth) Provide(ctx context.Context) any {
 
 type Option func(o *Options)
 
-func (oauth *OAuth) HandleAuth(code, codeVerifier string, fields []string) (*localOauth2.User, error) {
-	token, err := oauth.FetchAccessToken(code, codeVerifier)
+func (oauth *OAuth) HandleAuth(code *plugin.VerifyCode) (*plugin.User, error) {
+	token, err := oauth.FetchAccessToken(code.Code, code.CodeVerifier)
 	if err != nil {
 		return nil, err
 	}
 	// 获取用户信息
-	userInfo, err := oauth.GetUserInfo(token.AccessToken, fields)
+	userInfo, err := oauth.GetUserInfo(token.AccessToken, code.Fields)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (oauth *OAuth) HandleAuth(code, codeVerifier string, fields []string) (*loc
 	if !exist {
 		return nil, errors.New("获取用户信息失败: 未找到用户信息")
 	}
-	return &localOauth2.User{
+	return &plugin.User{
 		UserId:   data.OpenId,
 		UserName: data.Username,
 		Picture:  data.AvatarURL100,

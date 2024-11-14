@@ -23,7 +23,7 @@ type Option func(o *Options)
 
 func (oauth *OAuth) Provide(ctx context.Context) any {
 	var confName string
-	name, ok := ctx.Value(new(injector.NameKey)).(string)
+	name, ok := ctx.Value(injector.NameKey{}).(string)
 	if ok && len(name) > 0 {
 		confName = "." + name
 	}
