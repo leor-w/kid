@@ -31,9 +31,9 @@ func (g *Jwt) Provide(ctx context.Context) interface{} {
 	}
 	defaultJwt = New(
 		WithIssuer(config.GetString(utils.GetConfigurationItem(confPrefix, "issuer"))),
-		WithRefreshExpire(config.GetDuration(utils.GetConfigurationItem(confPrefix, "refreshExpire"))*time.Hour*24),
+		WithRefreshExpire(config.GetDuration(utils.GetConfigurationItem(confPrefix, "refresh_expire"))*time.Hour*24),
 		WithExpire(config.GetDuration(utils.GetConfigurationItem(confPrefix, "expire"))*time.Hour*24),
-		WithSigningMethod(SigningMethod(config.GetString(utils.GetConfigurationItem(confPrefix, "signingMethod")))),
+		WithSigningMethod(SigningMethod(config.GetString(utils.GetConfigurationItem(confPrefix, "signing_method")))),
 		WithKey([]byte(config.GetString(utils.GetConfigurationItem(confPrefix, "secret")))),
 	)
 	return defaultJwt
@@ -46,13 +46,14 @@ type claims struct {
 
 type Option func(*Options)
 
-func (g *Jwt) License(user *guard.User) (string, string, error) {
+func (g *Jwt) License(user *guard.User, newRefresh bool) (string, string, error) {
 	tokenDetail := &guard.TokenInfo{
 		User:                  *user,
 		ExpiredAt:             time.Now().Add(g.options.Expire).Unix(),
 		RefreshTokenExpiredAt: time.Now().Add(g.options.RefreshExpire).Unix(),
 		IssuerAt:              time.Now().Unix(),
 	}
+	user.TokenType = guard.AccessToken
 	token := jwt.NewWithClaims(g.getSignMethod(), &claims{
 		User: user,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -68,20 +69,25 @@ func (g *Jwt) License(user *guard.User) (string, string, error) {
 	if err := g.store.Save(license, tokenDetail); err != nil {
 		return "", "", fmt.Errorf("JWT 保存凭证错误: %w", err)
 	}
-	refreshToken := jwt.NewWithClaims(g.getSignMethod(), &claims{
-		User: user,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(g.options.RefreshExpire)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    g.options.Issuer,
-		},
-	})
-	refreshLicense, err := refreshToken.SignedString(g.options.Key)
-	if err != nil {
-		return "", "", fmt.Errorf("JWT 刷新凭证生成错误: %w", err)
-	}
-	if err := g.store.Save(refreshLicense, tokenDetail); err != nil {
-		return "", "", fmt.Errorf("JWT 保存刷新凭证错误: %w", err)
+	var refreshLicense string
+	if newRefresh { // 生成新的刷新凭证
+		user.TokenType = guard.RefreshToken
+		refreshToken := jwt.NewWithClaims(g.getSignMethod(), &claims{
+			User: user,
+			RegisteredClaims: jwt.RegisteredClaims{
+				ExpiresAt: jwt.NewNumericDate(time.Now().Add(g.options.RefreshExpire)),
+				IssuedAt:  jwt.NewNumericDate(time.Now()),
+				Issuer:    g.options.Issuer,
+			},
+		})
+		refreshLicense, err = refreshToken.SignedString(g.options.Key)
+		if err != nil {
+			return "", "", fmt.Errorf("JWT 刷新凭证生成错误: %w", err)
+		}
+		tokenDetail.Token = license
+		if err := g.store.Save(refreshLicense, tokenDetail); err != nil {
+			return "", "", fmt.Errorf("JWT 保存刷新凭证错误: %w", err)
+		}
 	}
 	return license, refreshLicense, nil
 }
@@ -92,25 +98,20 @@ func (g *Jwt) RefreshLicense(refreshLicense string) (string, error) {
 		return "", err
 	}
 	if claims, ok := refreshToken.Claims.(*claims); ok && refreshToken.Valid {
+		if claims.User.TokenType != guard.RefreshToken {
+			return "", fmt.Errorf("jwt.RefreshLicense: 刷新凭证类型错误")
+		}
 		if time.Now().Unix() > claims.ExpiresAt.Unix() {
-			return "", fmt.Errorf("jwt.RefreshLicense: refresh token is expired")
+			return "", fmt.Errorf("jwt.RefreshLicense: 刷新凭证已过期")
 		}
-		if time.Now().Unix() > claims.IssuedAt.Unix() {
-			return "", fmt.Errorf("jwt.RefreshLicense: refresh token is invalid")
+		if time.Now().Unix() < claims.IssuedAt.Unix() {
+			return "", fmt.Errorf("jwt.RefreshLicense: 刷新凭证已被吊销")
 		}
-		license, _, err := g.License(claims.User)
+		newToken, _, err := g.License(claims.User, false)
 		if err != nil {
 			return "", err
 		}
-		if err := g.store.Save(license, &guard.TokenInfo{
-			User:                  *claims.User,
-			ExpiredAt:             time.Now().Add(g.options.Expire).Unix(),
-			RefreshTokenExpiredAt: time.Now().Add(g.options.RefreshExpire).Unix(),
-			IssuerAt:              time.Now().Unix(),
-		}); err != nil {
-			return "", fmt.Errorf("jwt 刷新凭证保存错误: %w", err)
-		}
-		return license, nil
+		return newToken, nil
 	}
 	return "", fmt.Errorf("jwt 刷新凭证验证失败")
 }
@@ -129,9 +130,12 @@ func (g *Jwt) Verify(license string) (*guard.User, error) {
 		return nil, err
 	}
 	if claims, ok := token.Claims.(*claims); ok && token.Valid {
+		if claims.User.TokenType != guard.AccessToken {
+			return nil, fmt.Errorf("jwt.Verify: 凭证类型错误")
+		}
 		return claims.User, nil
 	}
-	return nil, fmt.Errorf("jwt.Verify: token valid failed")
+	return nil, fmt.Errorf("jwt.Verify: 凭证验证失败")
 }
 
 func (g *Jwt) Cancellation(license string) error {
