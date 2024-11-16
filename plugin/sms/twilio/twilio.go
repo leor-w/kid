@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/leor-w/kid/database/redis"
@@ -91,6 +92,20 @@ func (t *Adapter) Send(params *sms.Config) error {
 	smsCode := &verify.CreateVerificationParams{}
 	smsCode.SetTo(params.Phone)
 	smsCode.SetChannel("sms")
+	if params.Temp != "" {
+		if strings.Contains(params.Temp, "{code}") {
+			params.Temp = strings.Replace(params.Temp, "{code}", params.Code, -1)
+		} else {
+			params.Temp += " " + params.Code
+		}
+		smsCode.SetCustomMessage(params.Temp)
+	} else {
+		smsCode.SetCustomCode(params.Code)
+		smsCode.SetLocale(params.Language)
+		if params.TempParams != "" {
+			smsCode.SetTemplateCustomSubstitutions(params.TempParams)
+		}
+	}
 	resp, err := t.client.VerifyV2.CreateVerification(t.options.ServiceSid, smsCode)
 	if err != nil {
 		return fmt.Errorf("发送短信验证码失败: %s", err.Error())
