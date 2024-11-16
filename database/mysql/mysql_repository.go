@@ -83,7 +83,7 @@ func (repo *Repository) getTx(tx context.Context) *gorm.DB {
 }
 
 func (repo *Repository) Exist(finder *finder.Finder) bool {
-	var db = repo.DB
+	var db = repo.getTx(finder.Tx)
 	if finder.Debug {
 		db.Debug()
 	}
@@ -103,7 +103,7 @@ func (repo *Repository) Exist(finder *finder.Finder) bool {
 }
 
 func (repo *Repository) GetOne(finder *finder.Finder) error {
-	db := repo.DB.Scopes(Wheres(finder.Wheres.Wheres...))
+	var db = repo.getTx(finder.Tx).Scopes(Wheres(finder.Wheres.Wheres...))
 	if finder.Debug {
 		db.Debug()
 	}
@@ -133,7 +133,7 @@ func (repo *Repository) GetByKV(kv map[string]interface{}, model interface{}) er
 }
 
 func (repo *Repository) Find(finder *finder.Finder) error {
-	var db = repo.DB.DB
+	var db = repo.getTx(finder.Tx)
 	if finder.Wheres != nil && len(finder.Wheres.Wheres) > 0 {
 		db = db.Scopes(Wheres(finder.Wheres.Wheres...))
 	}

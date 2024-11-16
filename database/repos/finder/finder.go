@@ -1,11 +1,14 @@
 package finder
 
 import (
+	"context"
 	"github.com/leor-w/kid/database/repos/where"
 	"gorm.io/gorm"
 )
 
 type Finder struct {
+	// 数据库事务上下文
+	Tx context.Context
 	// 查询的模型
 	Model interface{}
 
