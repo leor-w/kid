@@ -1,0 +1,3 @@
+google:
+  pay:
+    server_account_file: "config/google/pay/server_account.json"

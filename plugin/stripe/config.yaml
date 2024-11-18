@@ -1,0 +1,6 @@
+stripe:
+  secret_key: "sk_xxxxxxxx"
+  webhook_secret: "whsec_xxxxxxxx"
+  publishable_key: "xxxxxxxx"
+  success_url: "http://localhost:8080/success"
+  failed_url: "http://localhost:8080/cancel"
