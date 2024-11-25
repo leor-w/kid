@@ -103,6 +103,10 @@ func (conf *Config) GetInt(key string) int {
 	return cast.ToInt(conf.find(key))
 }
 
+func (conf *Config) GetUint(key string) uint {
+	return cast.ToUint(conf.find(key))
+}
+
 func (conf *Config) GetIntSlice(key string) []int {
 	return cast.ToIntSlice(conf.find(key))
 }
@@ -195,8 +199,16 @@ func GetInt(key string) int {
 	return defaultConfig.GetInt(key)
 }
 
+func GetUint(key string) uint {
+	return defaultConfig.GetUint(key)
+}
+
 func GetIntSlice(key string) []int {
 	return defaultConfig.GetIntSlice(key)
+}
+
+func GetUint32(key string) uint32 {
+	return uint32(defaultConfig.GetUint(key))
 }
 
 func GetInt64(key string) int64 {

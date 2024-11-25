@@ -3,6 +3,10 @@ package logrus
 import (
 	"context"
 	"fmt"
+	awsConf "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	logruscloudwatch "github.com/innix/logrus-cloudwatch"
 
 	"github.com/leor-w/injector"
 
@@ -127,9 +131,10 @@ func NewLogger(opts ...logger.Option) *logrusLogger {
 func Default(name string) logger.Logger {
 	confPrefix := utils.GetConfigurationItem("logger", name)
 	if !config.Exist(confPrefix) {
-		panic(fmt.Sprintf("config.yaml not found configuration item [%s]", confPrefix))
+		panic(fmt.Sprintf("配置文件未找到配置项： [%s]", confPrefix))
 	}
 	log := NewLogger(
+		WithLogLevel(config.GetUint32(utils.GetConfigurationItem(confPrefix, "level"))),
 		WithFormatter(formatters.NewSimpleFormatter()),
 		WithReportCall(config.GetBool(utils.GetConfigurationItem(confPrefix, "reportCaller"))),
 	)
@@ -140,6 +145,34 @@ func Default(name string) logger.Logger {
 		simple.WithRotate(config.GetDuration(utils.GetConfigurationItem(confPrefix, "rotate"))),
 		simple.WithMaxAge(config.GetDuration(utils.GetConfigurationItem(confPrefix, "maxAge"))),
 	)
+	if config.Exist(utils.GetConfigurationItem(confPrefix, "hook.cloudwatch")) {
+		cfg, err := awsConf.LoadDefaultConfig(context.Background(),
+			awsConf.WithRegion(config.GetString(utils.GetConfigurationItem(confPrefix, "hook.cloudwatch.region"))),
+			awsConf.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
+				config.GetString(utils.GetConfigurationItem(confPrefix, "hook.cloudwatch.accessKey")),
+				config.GetString(utils.GetConfigurationItem(confPrefix, "hook.cloudwatch.secretKey")),
+				"",
+			)),
+		)
+		if err != nil {
+			panic(fmt.Sprintf("加载 AWS CloudWatch 失败 : %s", err.Error()))
+		}
+		client := cloudwatchlogs.NewFromConfig(cfg)
+
+		logLevel := config.GetUint32(utils.GetConfigurationItem(confPrefix, "level"))
+		cloudwatchHook, err := logruscloudwatch.New(client, &logruscloudwatch.Options{
+			Levels:               logrus.AllLevels[:logLevel],
+			Formatter:            formatters.NewSimpleFormatter(),
+			MaxBatchSize:         config.GetInt(utils.GetConfigurationItem(confPrefix, "hook.cloudwatch.maxBatchSize")),
+			ReturnErrorIfStopped: config.GetBool(utils.GetConfigurationItem(confPrefix, "hook.cloudwatch.returnErr")),
+			LogGroupName:         config.GetString(utils.GetConfigurationItem(confPrefix, "hook.cloudwatch.group")),
+			LogStreamName:        config.GetString(utils.GetConfigurationItem(confPrefix, "hook.cloudwatch.stream")),
+		})
+		if err != nil {
+			panic(fmt.Sprintf("初始化 CloudWatch 日志钩子失败 : %s", err.Error()))
+		}
+		log.Hook(cloudwatchHook)
+	}
 	log.Hook(rotate)
 	return log
 }

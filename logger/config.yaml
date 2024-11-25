@@ -1,0 +1,15 @@
+logger:
+  level: 3 # 日志默认输出等级 3 = info
+  name: "logger" # 日志的前缀名称
+  reportCaller: false # 是否启动输出调用信息 默认为 false
+  path:  ./logs  # 日志文件存放路径
+  link: "" # 日志文件自动软连接到指定位置
+  rotation: 24  # 日志分割时长(小时)
+  maxAge: 14 # 日志长保留时间
+  hook:
+    cloudwatch:
+      region: "us-west-2"
+      maxBatchSize: 500 # 日志批量发送最大数量，超过此数量会自动分批发送，默认为500，最大为10000
+      returnErr: false # 如果已关闭日志输出，是否返回错误信息，默认为false
+      group: "logger" # 日志组名称
+      stream: "logger" # 日志流名称

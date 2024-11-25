@@ -6,18 +6,14 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-
-	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-
-	config2 "github.com/aws/aws-sdk-go-v2/config"
+	awsConf "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
-
-	"github.com/leor-w/kid/utils"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 
 	"github.com/leor-w/injector"
 	"github.com/leor-w/kid/config"
-
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/leor-w/kid/utils"
 )
 
 type AwsS3 struct {
@@ -60,9 +56,9 @@ func (awsS3 *AwsS3) PreSignClient() *s3.PresignClient {
 
 func (awsS3 *AwsS3) Client() *s3.Client {
 	if awsS3.s3Client == nil {
-		cfg, err := config2.LoadDefaultConfig(context.TODO(),
-			config2.WithRegion(awsS3.options.Region),
-			config2.WithCredentialsProvider(
+		cfg, err := awsConf.LoadDefaultConfig(context.TODO(),
+			awsConf.WithRegion(awsS3.options.Region),
+			awsConf.WithCredentialsProvider(
 				credentials.NewStaticCredentialsProvider(
 					awsS3.options.AccessKey,
 					awsS3.options.SecretKey,

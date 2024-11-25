@@ -13,7 +13,8 @@ import (
 )
 
 type GooglePay struct {
-	options *Options
+	googleService *androidpublisher.Service
+	options       *Options
 }
 
 type Option func(*Options)
@@ -33,18 +34,47 @@ func (gp *GooglePay) Provide(ctx context.Context) any {
 	)
 }
 
-func (gp *GooglePay) VerifyInAPPPurchase(purchaseConf *PurchaseVerifyConfig) (*ProductPurchase, error) {
+// productGet 获取内购商品订单信息
+func (gp *GooglePay) productGet(conf *PurchaseConfig) (*androidpublisher.ProductPurchase, error) {
 	srv, err := androidpublisher.NewService(context.Background(), option.WithCredentialsFile(gp.options.ServerAccountFile))
 	if err != nil {
-		return nil, fmt.Errorf("google 内购服务初始化失败: %s", err.Error())
+		return nil, fmt.Errorf("内购服务初始化失败: %s", err.Error())
 	}
-	// 验证内购
-	purchase, err := srv.Purchases.Products.Get(purchaseConf.PackageName, purchaseConf.ProductID, purchaseConf.PurchaseToken).Do()
+	// 通过客户端或者Google推送的购买信息验证购买状态
+	purchase, err := srv.Purchases.Products.Get(conf.PackageName, conf.ProductID, conf.PurchaseToken).Do()
 	if err != nil {
-		return nil, fmt.Errorf("google 内购验证失败: %s", err.Error())
+		return nil, fmt.Errorf("内购商品订单验证失败: %s", err.Error())
 	}
+	return purchase, nil
+}
+
+// subscriptionGet 获取内购订阅商品订单信息
+func (gp *GooglePay) subscriptionGet(conf *PurchaseConfig) (*androidpublisher.SubscriptionPurchase, error) {
+	srv, err := androidpublisher.NewService(context.Background(), option.WithCredentialsFile(gp.options.ServerAccountFile))
+	if err != nil {
+		return nil, fmt.Errorf("内购服务初始化失败: %s", err.Error())
+	}
+	// 通过客户端或者Google推送的购买信息验证购买状态
+	purchase, err := srv.Purchases.Subscriptions.Get(conf.PackageName, conf.ProductID, conf.PurchaseToken).Do()
+	if err != nil {
+		return nil, fmt.Errorf("内购商品订单验证失败: %s", err.Error())
+	}
+	return purchase, nil
+}
+
+// GetConsumable 获取内购消耗型商品
+func (gp *GooglePay) GetConsumable(purchaseConf *PurchaseConfig) (*ProductPurchase, error) {
+	purchase, err := gp.productGet(purchaseConf)
+	if err != nil {
+		return nil, err
+	}
+	// 验证商品购买的状态，必须为已购买状态
 	if purchase.PurchaseState != 0 {
-		return nil, fmt.Errorf("google 内购状态异常: %d", purchase.PurchaseState)
+		return nil, fmt.Errorf("内购商品支付状态错误，当前状态为: %d", purchase.PurchaseState)
+	}
+	// 如果内购商品已消耗，无法重复消耗
+	if purchase.ConsumptionState == 1 {
+		return nil, fmt.Errorf("内购商品已消耗，无法重复消耗")
 	}
 	return &ProductPurchase{
 		Kind:                        purchase.Kind,
@@ -65,10 +95,102 @@ func (gp *GooglePay) VerifyInAPPPurchase(purchaseConf *PurchaseVerifyConfig) (*P
 	}, nil
 }
 
+// ConfirmConsumable 确认消耗型商品
+func (gp *GooglePay) ConfirmConsumable(conf *PurchaseConfig) error {
+	srv, err := androidpublisher.NewService(context.Background(), option.WithCredentialsFile(gp.options.ServerAccountFile))
+	if err != nil {
+		return fmt.Errorf("google 内购服务初始化失败: %s", err.Error())
+	}
+	// 向 google 确认已消耗内购，如果3天内未消耗，google 会自动退款
+	if err := srv.Purchases.Products.Consume(conf.PackageName, conf.ProductID, conf.PurchaseToken).Do(); err != nil {
+		return fmt.Errorf("内购商品确认消耗失败: %s", err.Error())
+	}
+	return nil
+}
+
+// GetNonConsumable 获取非消耗型商品
+func (gp *GooglePay) GetNonConsumable(conf *PurchaseConfig) (*ProductPurchase, error) {
+	// 通过客户端或者Google推送的购买信息验证购买状态
+	purchase, err := gp.googleService.Purchases.Products.Get(conf.PackageName, conf.ProductID, conf.PurchaseToken).Do()
+	if err != nil {
+		return nil, fmt.Errorf("google 内购验证失败: %s", err.Error())
+	}
+	// 验证商品购买的状态，必须为已购买状态
+	if purchase.PurchaseState != 0 {
+		return nil, fmt.Errorf("内购商品支付状态错误，当前状态为: %d", purchase.PurchaseState)
+	}
+	// 如果内购商品已确认，无法重复确认
+	if purchase.AcknowledgementState == 1 {
+		return nil, fmt.Errorf("内购商品已确认，无法重复确认")
+	}
+	return &ProductPurchase{
+		Kind:                        purchase.Kind,
+		PurchaseTimeMillis:          purchase.PurchaseTimeMillis,
+		PurchaseState:               purchase.PurchaseState,
+		ConsumptionState:            purchase.ConsumptionState,
+		DeveloperPayload:            purchase.DeveloperPayload,
+		OrderId:                     purchase.OrderId,
+		PurchaseType:                *purchase.PurchaseType,
+		AcknowledgementState:        purchase.AcknowledgementState,
+		PurchaseToken:               purchase.PurchaseToken,
+		ProductId:                   purchase.ProductId,
+		Quantity:                    purchase.Quantity,
+		ObfuscatedExternalAccountId: purchase.ObfuscatedExternalAccountId,
+		ObfuscatedExternalProfileId: purchase.ObfuscatedExternalProfileId,
+		RegionCode:                  purchase.RegionCode,
+		RefundableQuantity:          purchase.RefundableQuantity,
+	}, nil
+}
+
+func (gp *GooglePay) ConfirmNonConsumable(conf *PurchaseConfig) error {
+	// 确认非消耗型商品
+	if err := gp.googleService.Purchases.Products.
+		Acknowledge(
+			conf.PackageName,
+			conf.ProductID,
+			conf.PurchaseToken,
+			nil,
+		).Do(); err != nil {
+		return fmt.Errorf("内购商品确认失败: %s", err.Error())
+	}
+	return nil
+}
+
+// VerifySubscriptionsPurchase 确认内购订阅商品
+func (gp *GooglePay) VerifySubscriptionsPurchase(conf *PurchaseConfig) error {
+	// 获取内购订阅商品订单信息
+	purchase, err := gp.googleService.Purchases.Subscriptionsv2.Get(conf.PackageName, conf.PurchaseToken).Do()
+	if err != nil {
+		return fmt.Errorf("内购订阅商品验证失败: %s", err.Error())
+	}
+	// 验证商品购买的状态，必须为已购买状态
+	if purchase.SubscriptionState != SubscriptionStateActive {
+		return fmt.Errorf("内购订阅商品支付状态错误，当前状态为: %v", purchase.SubscriptionState)
+	}
+	// 如果内购订阅商品已确认，无法重复确认
+	if purchase.AcknowledgementState == AcknowledgementStateAcknowledged {
+		return fmt.Errorf("内购订阅商品已确认，无法重复确认")
+	}
+	// 确认新的订阅商品
+	if err := gp.googleService.Purchases.Subscriptions.
+		Acknowledge(conf.PackageName, conf.ProductID, conf.PurchaseToken, nil).
+		Do(); err != nil {
+		return fmt.Errorf("内购订阅商品确认失败: %s", err.Error())
+	}
+	return nil
+}
+
 func NewGooglePay(opts ...Option) *GooglePay {
 	options := &Options{}
 	for _, o := range opts {
 		o(options)
 	}
-	return &GooglePay{options: options}
+	googleService, err := androidpublisher.NewService(context.Background(), option.WithCredentialsFile(options.ServerAccountFile))
+	if err != nil {
+		panic(fmt.Sprintf("google 内购服务初始化失败: %s", err.Error()))
+	}
+	return &GooglePay{
+		googleService: googleService,
+		options:       options,
+	}
 }

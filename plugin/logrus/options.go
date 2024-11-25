@@ -11,6 +11,12 @@ type Options struct {
 	reportCall bool
 }
 
+func WithLogLevel(logLevel uint32) logger.Option {
+	return func(options *logger.Options) {
+		options.Level = logger.Level(logLevel)
+	}
+}
+
 type formatterKey struct{}
 
 func WithFormatter(formatter logrus.Formatter) logger.Option {

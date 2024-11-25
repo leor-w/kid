@@ -1,6 +1,6 @@
 package pay
 
-type PurchaseVerifyConfig struct {
+type PurchaseConfig struct {
 	/* GooglePlay 包名 */
 	PackageName string `json:"packageName"`
 	/* GooglePlay 商品 ID */
@@ -49,3 +49,21 @@ type ProductPurchase struct {
 	/* 符合退款条件的数量，即尚未退款的数量。该值反映的是基于数量的部分退款和全额退款。 */
 	RefundableQuantity int64 `json:"refundableQuantity"`
 }
+
+const (
+	SubscriptionStateUnspecified             = "SUBSCRIPTION_STATE_UNSPECIFIED"               // 未指定的订阅状态
+	SubscriptionStatePending                 = "SUBSCRIPTION_STATE_PENDING"                   // 订阅已创建，但在注册期间正在等待付款。在此状态下，所有商品都在等待付款。
+	SubscriptionStateActive                  = "SUBSCRIPTION_STATE_ACTIVE"                    // 订阅有效。- (1) 如果订阅是自动续订型方案，则至少有一个项目处于 autoRenewEnabled 且未过期。- (2) 如果订阅是预付费方案，则至少有一个商品未过期。
+	SubscriptionStatePaused                  = "SUBSCRIPTION_STATE_PAUSED"                    // 订阅已暂停。仅当订阅为自动续订型方案时，状态才可用。在此状态下，所有项目都处于暂停状态。
+	SubscriptionStateInGracePeriod           = "SUBSCRIPTION_STATE_IN_GRACE_PERIOD"           // 订阅处于宽限期。仅当订阅为自动续订型方案时，状态才可用。在此状态下，所有项都处于宽限期。
+	SubscriptionStateOnHold                  = "SUBSCRIPTION_STATE_ON_HOLD"                   // 订阅处于暂停状态（已暂停）。仅当订阅为自动续订型方案时，状态才可用。在此状态下，所有项目均处于保全状态。
+	SubscriptionStateCancelled               = "SUBSCRIPTION_STATE_CANCELED"                  // 订阅已取消，但尚未到期。仅当订阅为自动续订型方案时，状态才可用。所有项的 autoRenewEnabled 都设为了 false。
+	SubscriptionStateExpired                 = "SUBSCRIPTION_STATE_EXPIRED"                   // 订阅已过期。所有商品的 expiryTime 都是过去的时间。
+	SubscriptionStatePendingPurchaseCanceled = "SUBSCRIPTION_STATE_PENDING_PURCHASE_CANCELED" // 待处理的订阅交易已取消。如果此待处理的购买交易是针对现有订阅，请使用 linkedPurchaseToken 获取该订阅的当前状态。
+)
+
+const (
+	AcknowledgementStateUnspecified  = "ACKNOWLEDGEMENT_STATE_UNSPECIFIED"  // 未指定的确认状态。
+	AcknowledgementStatePending      = "ACKNOWLEDGEMENT_STATE_PENDING"      // 订阅尚未确认。
+	AcknowledgementStateAcknowledged = "ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED" // 订阅已确认。
+)
