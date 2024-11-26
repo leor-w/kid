@@ -161,7 +161,7 @@ func Default(name string) logger.Logger {
 
 		logLevel := config.GetUint32(utils.GetConfigurationItem(confPrefix, "level"))
 		cloudwatchHook, err := logruscloudwatch.New(client, &logruscloudwatch.Options{
-			Levels:               logrus.AllLevels[:logLevel],
+			Levels:               utils.GetLogLevel(logLevel),
 			Formatter:            formatters.NewSimpleFormatter(),
 			MaxBatchSize:         config.GetInt(utils.GetConfigurationItem(confPrefix, "hook.cloudwatch.maxBatchSize")),
 			ReturnErrorIfStopped: config.GetBool(utils.GetConfigurationItem(confPrefix, "hook.cloudwatch.returnErr")),
