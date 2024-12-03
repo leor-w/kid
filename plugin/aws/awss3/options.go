@@ -1,9 +1,10 @@
 package awss3
 
 type Options struct {
-	Region    string
-	AccessKey string
-	SecretKey string
+	Region       string
+	AccessKey    string
+	SecretKey    string
+	CacheControl string
 }
 
 func WithRegion(region string) Option {
@@ -21,5 +22,11 @@ func WithAccessKey(accessKey string) Option {
 func WithSecretKey(secretKey string) Option {
 	return func(o *Options) {
 		o.SecretKey = secretKey
+	}
+}
+
+func WithCacheControl(cacheControl string) Option {
+	return func(o *Options) {
+		o.CacheControl = cacheControl
 	}
 }

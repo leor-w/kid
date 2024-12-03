@@ -38,6 +38,7 @@ func (awsS3 *AwsS3) Provide(ctx context.Context) any {
 		WithRegion(config.GetString(utils.GetConfigurationItem(confPrefix, "region"))),
 		WithAccessKey(config.GetString(utils.GetConfigurationItem(confPrefix, "access_key"))),
 		WithSecretKey(config.GetString(utils.GetConfigurationItem(confPrefix, "secret_key"))),
+		WithCacheControl(config.GetString(utils.GetConfigurationItem(confPrefix, "cache_control"))),
 	)
 }
 
@@ -75,11 +76,16 @@ func (awsS3 *AwsS3) Client() *s3.Client {
 }
 
 // GetPreSignUploadURL 获取预签名上传链接
-func (awsS3 *AwsS3) GetPreSignUploadURL(bucket, key string, expires time.Duration) (string, error) {
+func (awsS3 *AwsS3) GetPreSignUploadURL(conf *GetPreSignURLConf) (string, error) {
+	cacheControl := awsS3.options.CacheControl
+	if conf.CacheControl != "" {
+		cacheControl = conf.CacheControl
+	}
 	req, err := awsS3.PreSignClient().PresignPutObject(context.Background(), &s3.PutObjectInput{
-		Bucket: &bucket,
-		Key:    &key,
-	}, s3.WithPresignExpires(expires))
+		Bucket:       &conf.Bucket,
+		Key:          &conf.ObjectKey,
+		CacheControl: aws.String(cacheControl),
+	}, s3.WithPresignExpires(conf.Expires))
 	if err != nil {
 		return "", fmt.Errorf("获取预签名上传链接失败: %v", err)
 	}
@@ -99,11 +105,18 @@ func (awsS3 *AwsS3) GetPreSignDownloadURL(bucket, key string, expires time.Durat
 }
 
 // CreateMultipartUpload 创建分片上传
-func (awsS3 *AwsS3) CreateMultipartUpload(bucket, key, fileType string) (*MultipartResponse, error) {
+func (awsS3 *AwsS3) CreateMultipartUpload(conf *GetPreSignURLConf) (*MultipartResponse, error) {
+	cacheControl := awsS3.options.CacheControl
+	if conf.CacheControl != "" {
+		cacheControl = conf.CacheControl
+	}
+	expiredAt := time.Now().Add(conf.Expires)
 	input := &s3.CreateMultipartUploadInput{
-		Bucket:      &bucket,
-		Key:         &key,
-		ContentType: &fileType,
+		Bucket:       &conf.Bucket,
+		Key:          &conf.ObjectKey,
+		ContentType:  &conf.ContentType,
+		CacheControl: &cacheControl,
+		Expires:      &expiredAt,
 	}
 	resp, err := awsS3.Client().CreateMultipartUpload(context.Background(), input)
 	if err != nil {

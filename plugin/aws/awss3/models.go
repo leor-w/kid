@@ -2,6 +2,14 @@ package awss3
 
 import "time"
 
+type GetPreSignURLConf struct {
+	Bucket       string
+	ObjectKey    string
+	Expires      time.Duration
+	ContentType  string
+	CacheControl string
+}
+
 type MultipartResponse struct {
 	UploadId string
 }
