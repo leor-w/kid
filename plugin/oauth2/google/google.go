@@ -4,9 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/leor-w/kid/database/redis"
+	"github.com/leor-w/kid/plugin/lock"
+	"github.com/spf13/cast"
 	"google.golang.org/api/idtoken"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/leor-w/injector"
 	"golang.org/x/oauth2"
@@ -26,9 +30,16 @@ const (
 	endpointUserInfo = "https://www.googleapis.com/oauth2/v3/userinfo"
 )
 
+const (
+	IdTokenUsedKey = "google.oauth.idtoken.used"
+	LockKey        = "google.oauth.lock"
+)
+
 type OAuth struct {
 	oauthConfig oauth2.Config
 	options     Options
+	rds         *redis.Client `inject:""`
+	lock        lock.Lock     `inject:""`
 }
 
 func (auth *OAuth) Provide(ctx context.Context) any {
@@ -57,25 +68,42 @@ func (auth *OAuth) HandleAuth(code *plugin.VerifyCode) (*plugin.User, error) {
 		return nil, fmt.Errorf("解码授权码失败: %s", err.Error())
 	}
 	if code.Code == "" && code.Token != "" {
+		ok, err := auth.lock.Lock(LockKey, time.Minute)
+		if err != nil {
+			return nil, fmt.Errorf("获取锁失败: %s", err.Error())
+		}
+		if !ok {
+			return nil, fmt.Errorf("获取锁失败")
+		}
+		defer auth.lock.Unlock(LockKey)
+		exist, err := auth.rds.SIsMember(IdTokenUsedKey, code.Token).Result()
+		if err != nil {
+			return nil, fmt.Errorf("查询 ID Token 是否已使用失败: %s", err.Error())
+		}
+		if exist {
+			return nil, fmt.Errorf("ID Token 已使用")
+		}
 		// 通过 token 获取用户信息
-		ctx := context.Background()
-		validator, err := idtoken.NewValidator(ctx)
+		validator, err := idtoken.NewValidator(context.Background())
 		if err != nil {
 			return nil, fmt.Errorf("failed to create validator: %w", err)
 		}
-
 		// 验证 ID Token
-		payload, err := validator.Validate(ctx, code.Token, "")
+		payload, err := validator.Validate(context.Background(), code.Token, "")
 		if err != nil {
 			return nil, fmt.Errorf("failed to validate ID token: %w", err)
 		}
+		// 标记 ID Token 已使用
+		if _, err := auth.rds.SAdd(IdTokenUsedKey, code.Token).Result(); err != nil {
+			return nil, fmt.Errorf("标记 ID Token 已使用失败: %s", err.Error())
+		}
 		return &plugin.User{
 			UserId:   payload.Subject,
-			Email:    payload.Claims["email"].(string),
-			EmailVer: payload.Claims["email_verified"].(bool),
-			UserName: payload.Claims["name"].(string),
-			Picture:  payload.Claims["picture"].(string),
-			Locale:   payload.Claims["locale"].(string),
+			Email:    cast.ToString(payload.Claims["email"]),
+			EmailVer: cast.ToBool(payload.Claims["email_verified"]),
+			UserName: cast.ToString(payload.Claims["name"]),
+			Picture:  cast.ToString(payload.Claims["picture"]),
+			Locale:   cast.ToString(payload.Claims["locale"]),
 		}, nil
 	} else if code.Code != "" {
 		// 通过授权码换取 token
