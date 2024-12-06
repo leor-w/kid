@@ -28,6 +28,8 @@ type VerifyCode struct {
 		可以不传，套件内已经默认集成了open_id, union_id, avatar_url这三个字段信息
 		具体可选内容参考：https://developers.tiktok.com/doc/tiktok-api-v2-get-user-info?enter_method=left_navigation
 	*/
+
+	Token  string
 	Fields []string
 }
 

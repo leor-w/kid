@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/leor-w/injector"
 	"golang.org/x/oauth2"
@@ -53,12 +54,19 @@ func (auth *OAuth) HandleAuth(code *plugin.VerifyCode) (*plugin.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("解码授权码失败: %s", err.Error())
 	}
-	// 通过授权码换取 token
-	token, err := auth.oauthConfig.Exchange(context.Background(), codeUnescape)
-	if err != nil {
-		return nil, fmt.Errorf("授权码换取 token 失败: %s", err.Error())
+	var client *http.Client
+	if code.Code == "" && code.Token != "" {
+		// 通过 token 获取用户信息
+		client = auth.oauthConfig.Client(context.Background(), &oauth2.Token{AccessToken: code.Token})
+	} else {
+		// 通过授权码换取 token
+		token, err := auth.oauthConfig.Exchange(context.Background(), codeUnescape)
+		if err != nil {
+			return nil, fmt.Errorf("授权码换取 token 失败: %s", err.Error())
+		}
+		client = auth.oauthConfig.Client(context.Background(), token)
 	}
-	client := auth.oauthConfig.Client(context.Background(), token)
+
 	// 获取用户信息
 	userInfo, err := client.Get(endpointUserInfo)
 	if err != nil {
