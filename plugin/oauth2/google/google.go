@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/leor-w/injector"
@@ -68,14 +69,18 @@ func (auth *OAuth) HandleAuth(code *plugin.VerifyCode) (*plugin.User, error) {
 	}
 
 	// 获取用户信息
-	userInfo, err := client.Get(endpointUserInfo)
+	resp, err := client.Get(endpointUserInfo)
 	if err != nil {
 		return nil, fmt.Errorf("获取用户信息失败: %s", err.Error())
 	}
-	defer userInfo.Body.Close()
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		bodys, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("获取用户信息失败: %s", string(bodys))
+	}
 	// 解析用户信息
 	var user plugin.User
-	if err := json.NewDecoder(userInfo.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
 		return nil, fmt.Errorf("解析用户信息失败: %s", err.Error())
 	}
 	return &user, nil
