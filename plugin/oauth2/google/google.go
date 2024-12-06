@@ -31,8 +31,7 @@ const (
 )
 
 const (
-	IdTokenUsedKey = "google.oauth.idtoken.used"
-	LockKey        = "google.oauth.lock"
+	LockKey = "google.oauth.lock"
 )
 
 type OAuth struct {
@@ -76,13 +75,6 @@ func (auth *OAuth) HandleAuth(code *plugin.VerifyCode) (*plugin.User, error) {
 			return nil, fmt.Errorf("获取锁失败")
 		}
 		defer auth.lock.Unlock(LockKey)
-		exist, err := auth.rds.SIsMember(IdTokenUsedKey, code.Token).Result()
-		if err != nil {
-			return nil, fmt.Errorf("查询 ID Token 是否已使用失败: %s", err.Error())
-		}
-		if exist {
-			return nil, fmt.Errorf("ID Token 已使用")
-		}
 		// 通过 token 获取用户信息
 		validator, err := idtoken.NewValidator(context.Background())
 		if err != nil {
@@ -92,10 +84,6 @@ func (auth *OAuth) HandleAuth(code *plugin.VerifyCode) (*plugin.User, error) {
 		payload, err := validator.Validate(context.Background(), code.Token, "")
 		if err != nil {
 			return nil, fmt.Errorf("failed to validate ID token: %w", err)
-		}
-		// 标记 ID Token 已使用
-		if _, err := auth.rds.SAdd(IdTokenUsedKey, code.Token).Result(); err != nil {
-			return nil, fmt.Errorf("标记 ID Token 已使用失败: %s", err.Error())
 		}
 		return &plugin.User{
 			UserId:   payload.Subject,
