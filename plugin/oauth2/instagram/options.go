@@ -1,13 +1,10 @@
-package google
-
-import "time"
+package instagram
 
 type Options struct {
 	ClientID     string
 	ClientSecret string
 	RedirectURL  string
 	Scope        []string
-	TTL          time.Duration
 }
 
 func WithClientID(clientID string) Option {
@@ -29,16 +26,7 @@ func WithRedirectURL(redirectURL string) Option {
 }
 
 func WithScope(scope []string) Option {
-	scopes := make([]string, 0, len(scope))
-	for _, s := range scope {
-		switch s {
-		case "email":
-			scopes = append(scopes, ScopeEmail)
-		case "profile":
-			scopes = append(scopes, ScopeProfile)
-		}
-	}
 	return func(o *Options) {
-		o.Scope = scopes
+		o.Scope = scope
 	}
 }

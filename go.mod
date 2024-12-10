@@ -1,8 +1,6 @@
 module github.com/leor-w/kid
 
-go 1.21
-
-toolchain go1.22.7
+go 1.22
 
 require (
 	github.com/Timothylock/go-signin-with-apple v0.2.3

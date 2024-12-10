@@ -4,30 +4,21 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/leor-w/kid/database/redis"
-	"github.com/leor-w/kid/plugin/lock"
-	"github.com/spf13/cast"
-	"google.golang.org/api/idtoken"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/leor-w/injector"
+	"github.com/leor-w/kid/database/redis"
+	"github.com/leor-w/kid/logger"
+	"github.com/spf13/cast"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+	"google.golang.org/api/idtoken"
 
 	"github.com/leor-w/kid/config"
 	plugin "github.com/leor-w/kid/plugin/oauth2"
 	"github.com/leor-w/kid/utils"
-)
-
-const (
-	Profile = "https://www.googleapis.com/auth/userinfo.profile" // 获取用户信息
-	Email   = "https://www.googleapis.com/auth/userinfo.email"   // 获取用户邮箱
-)
-
-const (
-	endpointUserInfo = "https://www.googleapis.com/oauth2/v3/userinfo"
 )
 
 const (
@@ -38,7 +29,6 @@ type OAuth struct {
 	oauthConfig oauth2.Config
 	options     Options
 	rds         *redis.Client `inject:""`
-	lock        lock.Lock     `inject:""`
 }
 
 func (auth *OAuth) Provide(ctx context.Context) any {
@@ -61,69 +51,81 @@ func (auth *OAuth) Provide(ctx context.Context) any {
 
 type Option func(o *Options)
 
-func (auth *OAuth) HandleAuth(code *plugin.VerifyCode) (*plugin.User, error) {
+// HandleOAuth2ByAuthCode 处理授权码登录授权
+func (auth *OAuth) HandleOAuth2ByAuthCode(code *plugin.VerifyCode) (*plugin.OAuthUser, error) {
+	if !auth.stateExist(code.State) {
+		return nil, fmt.Errorf("google oauth2: 未知的授权来源或授权链接已过期，请重新授权")
+	}
 	codeUnescape, err := utils.RecursiveURLDecode(code.Code)
 	if err != nil {
-		return nil, fmt.Errorf("解码授权码失败: %s", err.Error())
+		return nil, fmt.Errorf("google oauth2: : 解码授权码失败: %s", err.Error())
 	}
-	if code.Code == "" && code.Token != "" {
-		ok, err := auth.lock.Lock(LockKey, time.Minute)
-		if err != nil {
-			return nil, fmt.Errorf("获取锁失败: %s", err.Error())
-		}
-		if !ok {
-			return nil, fmt.Errorf("获取锁失败")
-		}
-		defer auth.lock.Unlock(LockKey)
-		// 通过 token 获取用户信息
-		validator, err := idtoken.NewValidator(context.Background())
-		if err != nil {
-			return nil, fmt.Errorf("failed to create validator: %w", err)
-		}
-		// 验证 ID Token
-		payload, err := validator.Validate(context.Background(), code.Token, "")
-		if err != nil {
-			return nil, fmt.Errorf("failed to validate ID token: %w", err)
-		}
-		return &plugin.User{
-			UserId:   payload.Subject,
-			Email:    cast.ToString(payload.Claims["email"]),
-			EmailVer: cast.ToBool(payload.Claims["email_verified"]),
-			UserName: cast.ToString(payload.Claims["name"]),
-			Picture:  cast.ToString(payload.Claims["picture"]),
-			Locale:   cast.ToString(payload.Claims["locale"]),
-		}, nil
-	} else if code.Code != "" {
-		// 通过授权码换取 token
-		token, err := auth.oauthConfig.Exchange(context.Background(), codeUnescape)
-		if err != nil {
-			return nil, fmt.Errorf("授权码换取 token 失败: %s", err.Error())
-		}
-		client := auth.oauthConfig.Client(context.Background(), token)
-		// 获取用户信息
-		resp, err := client.Get(endpointUserInfo)
-		if err != nil {
-			return nil, fmt.Errorf("获取用户信息失败: %s", err.Error())
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusOK {
-			bodys, _ := io.ReadAll(resp.Body)
-			return nil, fmt.Errorf("获取用户信息失败: %s", string(bodys))
-		}
-		// 解析用户信息
-		var user plugin.User
-		if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
-			return nil, fmt.Errorf("解析用户信息失败: %s", err.Error())
-		}
-		return &user, nil
-	} else {
-		return nil, fmt.Errorf("授权码为空")
+	// 通过授权码换取 token
+	token, err := auth.oauthConfig.Exchange(context.Background(), codeUnescape)
+	if err != nil {
+		return nil, fmt.Errorf("google oauth2: : 授权码换取 token 失败: %s", err.Error())
 	}
-
+	client := auth.oauthConfig.Client(context.Background(), token)
+	// 获取用户信息
+	resp, err := client.Get(EndpointUserInfo)
+	if err != nil {
+		return nil, fmt.Errorf("google oauth2: : 获取用户信息失败: %s", err.Error())
+	}
+	defer func(Body io.ReadCloser) {
+		if err := Body.Close(); err != nil {
+			logger.Errorf("google oauth2: : 关闭获取信息响应流失败: %s", err.Error())
+		}
+	}(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("google oauth2: : 获取用户信息失败: %s", err.Error())
+		}
+		return nil, fmt.Errorf("google oauth2: : 获取用户信息失败: %s", string(body))
+	}
+	// 解析用户信息
+	var user plugin.OAuthUser
+	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
+		return nil, fmt.Errorf("google oauth2: : 解析用户信息失败: %s", err.Error())
+	}
+	return &user, nil
 }
 
-func (auth *OAuth) GetAuthPageURL() string {
-	return auth.oauthConfig.AuthCodeURL(utils.UUID())
+// HandleOAuth2ByAPPAuthToken 处理 APP 授权登录
+func (auth *OAuth) HandleOAuth2ByAPPAuthToken(token string) (*plugin.OAuthUser, error) {
+	// 通过 token 获取用户信息
+	validator, err := idtoken.NewValidator(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("google oauth2: : 验证用户信息失败: %w", err)
+	}
+	// 验证 ID Token
+	payload, err := validator.Validate(context.Background(), token, "")
+	if err != nil {
+		return nil, fmt.Errorf("google oauth2: : 验证用户信息失败: %w", err)
+	}
+	return &plugin.OAuthUser{
+		UserId:   payload.Subject,
+		Email:    cast.ToString(payload.Claims["email"]),
+		EmailVer: cast.ToBool(payload.Claims["email_verified"]),
+		UserName: cast.ToString(payload.Claims["name"]),
+		Picture:  cast.ToString(payload.Claims["picture"]),
+		Locale:   cast.ToString(payload.Claims["locale"]),
+	}, nil
+}
+
+// stateExist 判断 state 是否存在
+func (auth *OAuth) stateExist(state string) bool {
+	return auth.rds.Exists(GetOAuthURLIdentifierKey(state)).Val() > 0
+}
+
+// BuildAuthPageURL 构建授权页面 URL
+func (auth *OAuth) BuildAuthPageURL() (string, error) {
+	state := utils.UUID()
+	buildUrl := auth.oauthConfig.AuthCodeURL(state)
+	if err := auth.rds.Set(GetOAuthURLIdentifierKey(state), buildUrl, time.Minute*30).Err(); err != nil {
+		return "", fmt.Errorf("google oauth2: : 保存授权链接映射关系报错: %s", err.Error())
+	}
+	return buildUrl, nil
 }
 
 func New(opts ...Option) *OAuth {

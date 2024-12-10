@@ -9,21 +9,22 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
-	"github.com/leor-w/kid/logger"
-
-	plugin "github.com/leor-w/kid/plugin/oauth2"
+	"golang.org/x/oauth2"
 
 	"github.com/leor-w/injector"
 	"github.com/leor-w/kid/config"
+	"github.com/leor-w/kid/database/redis"
+	"github.com/leor-w/kid/logger"
+	plugin "github.com/leor-w/kid/plugin/oauth2"
 	"github.com/leor-w/kid/utils"
-
-	"golang.org/x/oauth2"
 )
 
 type OAuth struct {
 	options *Options
 	config  *oauth2.Config
+	rds     *redis.Client `inject:""`
 }
 
 func (oauth *OAuth) Provide(ctx context.Context) any {
@@ -46,7 +47,10 @@ func (oauth *OAuth) Provide(ctx context.Context) any {
 
 type Option func(o *Options)
 
-func (oauth *OAuth) HandleAuth(code *plugin.VerifyCode) (*plugin.User, error) {
+func (oauth *OAuth) HandleOAuth2ByAuthCode(code *plugin.VerifyCode) (*plugin.OAuthUser, error) {
+	if !oauth.stateExist(code.State) {
+		return nil, fmt.Errorf("tiktok oauth2: 未知的授权来源或授权链接已过期，请重新授权")
+	}
 	token, err := oauth.FetchAccessToken(code.Code, code.CodeVerifier)
 	if err != nil {
 		return nil, err
@@ -63,27 +67,57 @@ func (oauth *OAuth) HandleAuth(code *plugin.VerifyCode) (*plugin.User, error) {
 	if !exist {
 		return nil, errors.New("获取用户信息失败: 未找到用户信息")
 	}
-	return &plugin.User{
+	return &plugin.OAuthUser{
 		UserId:   data.OpenId,
 		UserName: data.Username,
 		Picture:  data.AvatarURL100,
 	}, nil
 }
 
-// GetAuthPageURL 获取授权页面 URL
-func (oauth *OAuth) GetAuthPageURL() string {
+// HandleOAuth2ByAPPAuthToken 处理 APP 授权登录
+func (oauth *OAuth) HandleOAuth2ByAPPAuthToken(token string) (*plugin.OAuthUser, error) {
+	userInfo, err := oauth.GetUserInfo(token, nil)
+	if err != nil {
+		return nil, err
+	}
+	if userInfo.Error.Code != "ok" {
+		return nil, fmt.Errorf("获取用户信息失败: 错误类型 %s; 错误信息: %s", userInfo.Error.Code, userInfo.Error.Message)
+	}
+	data, exist := userInfo.Data["user"]
+	if !exist {
+		return nil, errors.New("获取用户信息失败: 未找到用户信息")
+	}
+	return &plugin.OAuthUser{
+		UserId:   data.OpenId,
+		UserName: data.Username,
+		Picture:  data.AvatarURL100,
+	}, nil
+}
+
+func (oauth *OAuth) stateExist(state string) bool {
+	exist := oauth.rds.Exists(GetOAuthURLIdentifierKey(state))
+	return exist.Val() > 0
+}
+
+// BuildAuthPageURL 构建授权页面 URL
+func (oauth *OAuth) BuildAuthPageURL() (string, error) {
+	state := utils.UUID()
 	baseUrl, err := url.Parse(endpointAuth)
 	if err != nil {
-		return ""
+		return "", fmt.Errorf("tiktok oauth2: 解析地址失败: %s", err.Error())
 	}
 	params := url.Values{}
 	params.Add("client_key", oauth.options.ClientKey)
 	params.Add("scope", strings.Join(oauth.options.Scope, ","))
 	params.Add("response_type", "code")
 	params.Add("redirect_uri", oauth.options.RedirectURL)
-	params.Add("state", utils.UUID())
+	params.Add("state", state)
 	baseUrl.RawQuery = params.Encode()
-	return baseUrl.String()
+	buildUrl := baseUrl.String()
+	if err := oauth.rds.Set(GetOAuthURLIdentifierKey(state), buildUrl, time.Minute*30).Err(); err != nil {
+		return "", fmt.Errorf("tiktok oauth2: 设置 state 失败: %s", err.Error())
+	}
+	return buildUrl, nil
 }
 
 // executePostRequest 执行 POST 请求的通用函数
@@ -103,11 +137,7 @@ func (oauth *OAuth) executePostRequest(endpoint string, data url.Values, result 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("请求失败，状态码：%d", resp.StatusCode)
 	}
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("读取响应体失败: %s", err.Error())
-	}
-	if err := json.Unmarshal(bodyBytes, result); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return fmt.Errorf("解析响应失败: %s", err.Error())
 	}
 	return nil

@@ -1,0 +1,7 @@
+oauth2:
+  instagram:
+    client_id: "instagram_client_id"
+    client_secret: "instagram_client_secret"
+    redirect_url: "instagram_redirect_url" # 与 Google Cloud Console 中的 OAuth 2.0 客户端 ID 中的授权回调 URL 一致
+    scope:
+      - "email"

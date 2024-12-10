@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/leor-w/kid/utils"
 	"google.golang.org/api/androidpublisher/v3"
 	"google.golang.org/api/option"
 
 	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/plugin"
+	"github.com/leor-w/kid/utils"
 )
 
 type GooglePay struct {
@@ -27,7 +27,7 @@ func (gp *GooglePay) Provide(ctx context.Context) any {
 	}
 	confPrefix := fmt.Sprintf("google.pay%s", configName)
 	if !config.Exist(fmt.Sprintf(confPrefix)) {
-		panic(fmt.Sprintf("配置文件未找到配置项 [%s]", confPrefix))
+		panic(fmt.Sprintf("google play: 配置文件未找到配置项 [%s]", confPrefix))
 	}
 	return NewGooglePay(
 		WithServerAccountFile(config.GetString(utils.GetConfigurationItem(confPrefix, "server_account_file"))),
@@ -38,12 +38,12 @@ func (gp *GooglePay) Provide(ctx context.Context) any {
 func (gp *GooglePay) productGet(conf *PurchaseConfig) (*androidpublisher.ProductPurchase, error) {
 	srv, err := androidpublisher.NewService(context.Background(), option.WithCredentialsFile(gp.options.ServerAccountFile))
 	if err != nil {
-		return nil, fmt.Errorf("内购服务初始化失败: %s", err.Error())
+		return nil, fmt.Errorf("google play: 内购服务初始化失败: %s", err.Error())
 	}
 	// 通过客户端或者Google推送的购买信息验证购买状态
 	purchase, err := srv.Purchases.Products.Get(conf.PackageName, conf.ProductID, conf.PurchaseToken).Do()
 	if err != nil {
-		return nil, fmt.Errorf("内购商品订单验证失败: %s", err.Error())
+		return nil, fmt.Errorf("google play: 内购商品订单验证失败: %s", err.Error())
 	}
 	return purchase, nil
 }
@@ -52,12 +52,24 @@ func (gp *GooglePay) productGet(conf *PurchaseConfig) (*androidpublisher.Product
 func (gp *GooglePay) subscriptionGet(conf *PurchaseConfig) (*androidpublisher.SubscriptionPurchase, error) {
 	srv, err := androidpublisher.NewService(context.Background(), option.WithCredentialsFile(gp.options.ServerAccountFile))
 	if err != nil {
-		return nil, fmt.Errorf("内购服务初始化失败: %s", err.Error())
+		return nil, fmt.Errorf("google play: 内购服务初始化失败: %s", err.Error())
 	}
 	// 通过客户端或者Google推送的购买信息验证购买状态
 	purchase, err := srv.Purchases.Subscriptions.Get(conf.PackageName, conf.ProductID, conf.PurchaseToken).Do()
 	if err != nil {
-		return nil, fmt.Errorf("内购商品订单验证失败: %s", err.Error())
+		return nil, fmt.Errorf("google play: 内购商品订单验证失败: %s", err.Error())
+	}
+	return purchase, nil
+}
+
+// GetAndConfirmConsumable 获取并确认消耗型商品，如果内购商品已消耗，无法重复消耗。如果内购商品未消耗，确认消耗
+func (gp *GooglePay) GetAndConfirmConsumable(purchaseConf *PurchaseConfig) (*ProductPurchase, error) {
+	purchase, err := gp.GetConsumable(purchaseConf)
+	if err != nil {
+		return nil, err
+	}
+	if err := gp.ConfirmConsumable(purchaseConf); err != nil {
+		return nil, err
 	}
 	return purchase, nil
 }
@@ -70,11 +82,11 @@ func (gp *GooglePay) GetConsumable(purchaseConf *PurchaseConfig) (*ProductPurcha
 	}
 	// 验证商品购买的状态，必须为已购买状态
 	if purchase.PurchaseState != 0 {
-		return nil, fmt.Errorf("内购商品支付状态错误，当前状态为: %d", purchase.PurchaseState)
+		return nil, fmt.Errorf("google play: 内购商品支付状态错误，当前状态为: %d", purchase.PurchaseState)
 	}
 	// 如果内购商品已消耗，无法重复消耗
 	if purchase.ConsumptionState == 1 {
-		return nil, fmt.Errorf("内购商品已消耗，无法重复消耗")
+		return nil, fmt.Errorf("google play: 内购商品已消耗，无法重复消耗")
 	}
 	return &ProductPurchase{
 		Kind:                        purchase.Kind,
@@ -99,11 +111,11 @@ func (gp *GooglePay) GetConsumable(purchaseConf *PurchaseConfig) (*ProductPurcha
 func (gp *GooglePay) ConfirmConsumable(conf *PurchaseConfig) error {
 	srv, err := androidpublisher.NewService(context.Background(), option.WithCredentialsFile(gp.options.ServerAccountFile))
 	if err != nil {
-		return fmt.Errorf("google 内购服务初始化失败: %s", err.Error())
+		return fmt.Errorf("google play: 内购服务初始化失败: %s", err.Error())
 	}
 	// 向 google 确认已消耗内购，如果3天内未消耗，google 会自动退款
 	if err := srv.Purchases.Products.Consume(conf.PackageName, conf.ProductID, conf.PurchaseToken).Do(); err != nil {
-		return fmt.Errorf("内购商品确认消耗失败: %s", err.Error())
+		return fmt.Errorf("google play: 内购商品确认消耗失败: %s", err.Error())
 	}
 	return nil
 }
@@ -113,15 +125,15 @@ func (gp *GooglePay) GetNonConsumable(conf *PurchaseConfig) (*ProductPurchase, e
 	// 通过客户端或者Google推送的购买信息验证购买状态
 	purchase, err := gp.googleService.Purchases.Products.Get(conf.PackageName, conf.ProductID, conf.PurchaseToken).Do()
 	if err != nil {
-		return nil, fmt.Errorf("google 内购验证失败: %s", err.Error())
+		return nil, fmt.Errorf("google play: 内购验证失败: %s", err.Error())
 	}
 	// 验证商品购买的状态，必须为已购买状态
 	if purchase.PurchaseState != 0 {
-		return nil, fmt.Errorf("内购商品支付状态错误，当前状态为: %d", purchase.PurchaseState)
+		return nil, fmt.Errorf("google play: 内购商品支付状态错误，当前状态为: %d", purchase.PurchaseState)
 	}
 	// 如果内购商品已确认，无法重复确认
 	if purchase.AcknowledgementState == 1 {
-		return nil, fmt.Errorf("内购商品已确认，无法重复确认")
+		return nil, fmt.Errorf("google play: 内购商品已确认，无法重复确认")
 	}
 	return &ProductPurchase{
 		Kind:                        purchase.Kind,
@@ -151,7 +163,7 @@ func (gp *GooglePay) ConfirmNonConsumable(conf *PurchaseConfig) error {
 			conf.PurchaseToken,
 			nil,
 		).Do(); err != nil {
-		return fmt.Errorf("内购商品确认失败: %s", err.Error())
+		return fmt.Errorf("google play: 内购商品确认失败: %s", err.Error())
 	}
 	return nil
 }
@@ -161,21 +173,21 @@ func (gp *GooglePay) VerifySubscriptionsPurchase(conf *PurchaseConfig) error {
 	// 获取内购订阅商品订单信息
 	purchase, err := gp.googleService.Purchases.Subscriptionsv2.Get(conf.PackageName, conf.PurchaseToken).Do()
 	if err != nil {
-		return fmt.Errorf("内购订阅商品验证失败: %s", err.Error())
+		return fmt.Errorf("google play: 内购订阅商品验证失败: %s", err.Error())
 	}
 	// 验证商品购买的状态，必须为已购买状态
 	if purchase.SubscriptionState != SubscriptionStateActive {
-		return fmt.Errorf("内购订阅商品支付状态错误，当前状态为: %v", purchase.SubscriptionState)
+		return fmt.Errorf("google play: 内购订阅商品支付状态错误，当前状态为: %v", purchase.SubscriptionState)
 	}
 	// 如果内购订阅商品已确认，无法重复确认
 	if purchase.AcknowledgementState == AcknowledgementStateAcknowledged {
-		return fmt.Errorf("内购订阅商品已确认，无法重复确认")
+		return fmt.Errorf("google play: 内购订阅商品已确认，无法重复确认")
 	}
 	// 确认新的订阅商品
 	if err := gp.googleService.Purchases.Subscriptions.
 		Acknowledge(conf.PackageName, conf.ProductID, conf.PurchaseToken, nil).
 		Do(); err != nil {
-		return fmt.Errorf("内购订阅商品确认失败: %s", err.Error())
+		return fmt.Errorf("google play: 内购订阅商品确认失败: %s", err.Error())
 	}
 	return nil
 }
@@ -187,7 +199,7 @@ func NewGooglePay(opts ...Option) *GooglePay {
 	}
 	googleService, err := androidpublisher.NewService(context.Background(), option.WithCredentialsFile(options.ServerAccountFile))
 	if err != nil {
-		panic(fmt.Sprintf("google 内购服务初始化失败: %s", err.Error()))
+		panic(fmt.Sprintf("google play: 内购服务初始化失败: %s", err.Error()))
 	}
 	return &GooglePay{
 		googleService: googleService,

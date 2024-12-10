@@ -1,5 +1,7 @@
 package tiktok
 
+import "fmt"
+
 const (
 	endpointAuth     = "https://www.tiktok.com/v2/auth/authorize/"    // 授权页面地址
 	endpointToken    = "https://open.tiktokapis.com/v2/oauth/token/"  // 获取、刷新 access_token 地址
@@ -7,6 +9,15 @@ const (
 	endpointUserInfo = "https://open.tiktokapis.com/v2/user/info/"    // 获取用户信息地址
 )
 
+const (
+	OAuthUrlIdentifierKey = "google.oauth2.url.identifier.%s"
+)
+
+func GetOAuthURLIdentifierKey(state string) string {
+	return fmt.Sprintf(OAuthUrlIdentifierKey, state)
+}
+
+// UserScope 用户授权范围
 const (
 	UserScopeBasic        = "user.info.basic"
 	UserScopeArtistRead   = "artist.certification.read"
