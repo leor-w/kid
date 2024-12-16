@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+
 	"github.com/leor-w/kid/config"
 	"github.com/leor-w/kid/plugin"
 	"github.com/leor-w/kid/utils"
 	"github.com/stripe/stripe-go/v81"
 	"github.com/stripe/stripe-go/v81/paymentlink"
 	"github.com/stripe/stripe-go/v81/webhook"
-	"io"
-	"net/http"
 )
 
 type Stripe struct {
@@ -33,11 +34,26 @@ func (s *Stripe) Provide(ctx context.Context) any {
 	return NewStripe(
 		WithSecretKey(config.GetString(utils.GetConfigurationItem(confPrefix, "secret_key"))),
 		WithWebhookSecret(config.GetString(utils.GetConfigurationItem(confPrefix, "webhook_secret"))),
+		WithRedirectType(config.GetString(utils.GetConfigurationItem(confPrefix, "redirect_type"))),
+		WithRedirectURL(config.GetString(utils.GetConfigurationItem(confPrefix, "redirect_url"))),
 	)
 }
 
 func (s *Stripe) BuildPaymentLinkURL(conf *BuildPaymentLinkConfig) (string, error) {
+	afterCompletion := &stripe.PaymentLinkAfterCompletionParams{
+		Type: stripe.String(s.options.RedirectType),
+	}
+	if s.options.RedirectType == RedirectTypeRedirect {
+		afterCompletion.Redirect = &stripe.PaymentLinkAfterCompletionRedirectParams{
+			URL: stripe.String(s.options.RedirectURL),
+		}
+	} else if s.options.RedirectType == RedirectTypeHostedConfirmation {
+		afterCompletion.HostedConfirmation = &stripe.PaymentLinkAfterCompletionHostedConfirmationParams{
+			CustomMessage: stripe.String(s.options.RedirectURL),
+		}
+	}
 	params := &stripe.PaymentLinkParams{
+		AfterCompletion: afterCompletion,
 		LineItems: []*stripe.PaymentLinkLineItemParams{
 			{
 				Price:    stripe.String(conf.Price),

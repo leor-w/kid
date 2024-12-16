@@ -21,3 +21,8 @@ type BuildPaymentLinkConfig struct {
 	Quantity int
 	Metadata map[string]string
 }
+
+const (
+	RedirectTypeRedirect           = "redirect"
+	RedirectTypeHostedConfirmation = "hosted_confirmation"
+)

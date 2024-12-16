@@ -1,6 +1,5 @@
 stripe:
   secret_key: "sk_xxxxxxxx"
   webhook_secret: "whsec_xxxxxxxx"
-  publishable_key: "xxxxxxxx"
-  success_url: "http://localhost:8080/success"
-  failed_url: "http://localhost:8080/cancel"
+  redirect_type: "redirect" # hosted_confirmation 或 redirect
+  redirect_url: "http://localhost:3000/success"
