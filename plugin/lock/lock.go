@@ -4,11 +4,13 @@ import (
 	"context"
 	"time"
 
+	"github.com/leor-w/kid/logger"
+
 	"github.com/leor-w/kid/database/redis"
 )
 
 type Lock interface {
-	Lock(key string, ttl time.Duration) (bool, error)
+	Lock(key string, ttl time.Duration) bool
 	Unlock(key string) error
 }
 
@@ -22,12 +24,13 @@ func (rl *RedisLock) Provide(context.Context) interface{} {
 	return new(RedisLock)
 }
 
-func (rl *RedisLock) Lock(key string, ttl time.Duration) (bool, error) {
+func (rl *RedisLock) Lock(key string, ttl time.Duration) bool {
 	result, err := rl.rdb.SetNX(key, 1, ttl).Result()
 	if err != nil {
-		return false, err
+		logger.Errorf("lock: redis 锁获取失败: %s", err.Error())
+		return false
 	}
-	return result, nil
+	return result
 }
 
 func (rl *RedisLock) Check(key string) (bool, error) {

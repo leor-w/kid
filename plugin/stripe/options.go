@@ -1,10 +1,10 @@
 package stripe
 
 type Options struct {
-	SecretKey     string
-	WebhookSecret string
-	RedirectType  string
-	RedirectURL   string
+	SecretKey      string
+	WebhookSecret  string
+	RedirectType   string
+	RedirectDomain string
 }
 
 func WithSecretKey(secretKey string) Option {
@@ -25,8 +25,8 @@ func WithRedirectType(redirectType string) Option {
 	}
 }
 
-func WithRedirectURL(redirectURL string) Option {
+func WithRedirectDomain(redirectDomain string) Option {
 	return func(o *Options) {
-		o.RedirectURL = redirectURL
+		o.RedirectDomain = redirectDomain
 	}
 }

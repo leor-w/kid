@@ -35,23 +35,29 @@ func (s *Stripe) Provide(ctx context.Context) any {
 		WithSecretKey(config.GetString(utils.GetConfigurationItem(confPrefix, "secret_key"))),
 		WithWebhookSecret(config.GetString(utils.GetConfigurationItem(confPrefix, "webhook_secret"))),
 		WithRedirectType(config.GetString(utils.GetConfigurationItem(confPrefix, "redirect_type"))),
-		WithRedirectURL(config.GetString(utils.GetConfigurationItem(confPrefix, "redirect_url"))),
+		WithRedirectDomain(config.GetString(utils.GetConfigurationItem(confPrefix, "redirect_domain"))),
 	)
 }
 
 func (s *Stripe) BuildPaymentLinkURL(conf *BuildPaymentLinkConfig) (string, error) {
-	afterCompletion := &stripe.PaymentLinkAfterCompletionParams{
-		Type: stripe.String(s.options.RedirectType),
-	}
-	if s.options.RedirectType == RedirectTypeRedirect {
-		afterCompletion.Redirect = &stripe.PaymentLinkAfterCompletionRedirectParams{
-			URL: stripe.String(s.options.RedirectURL),
+	var afterCompletion *stripe.PaymentLinkAfterCompletionParams
+	var redirectUrl string
+	if len(conf.RedirectURI) > 0 {
+		afterCompletion = &stripe.PaymentLinkAfterCompletionParams{
+			Type: stripe.String(s.options.RedirectType),
 		}
-	} else if s.options.RedirectType == RedirectTypeHostedConfirmation {
-		afterCompletion.HostedConfirmation = &stripe.PaymentLinkAfterCompletionHostedConfirmationParams{
-			CustomMessage: stripe.String(s.options.RedirectURL),
+		redirectUrl = s.options.RedirectDomain + conf.RedirectURI
+		if s.options.RedirectType == RedirectTypeRedirect {
+			afterCompletion.Redirect = &stripe.PaymentLinkAfterCompletionRedirectParams{
+				URL: stripe.String(redirectUrl),
+			}
+		} else if s.options.RedirectType == RedirectTypeHostedConfirmation {
+			afterCompletion.HostedConfirmation = &stripe.PaymentLinkAfterCompletionHostedConfirmationParams{
+				CustomMessage: stripe.String(redirectUrl),
+			}
 		}
 	}
+
 	params := &stripe.PaymentLinkParams{
 		AfterCompletion: afterCompletion,
 		LineItems: []*stripe.PaymentLinkLineItemParams{

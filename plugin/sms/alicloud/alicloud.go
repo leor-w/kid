@@ -67,11 +67,7 @@ func (ali *Adapter) Send(params *sms.Config) error {
 		params.Code = utils.RandomSMSCode(6)
 	}
 	task.Code = params.Code
-	ok, err := ali.lock.Lock(sms.GetPhoneSendLockKey(params.Phone), time.Minute)
-	if err != nil {
-		return err
-	}
-	if !ok {
+	if !ali.lock.Lock(sms.GetPhoneSendLockKey(params.Phone), time.Minute) {
 		return fmt.Errorf("请勿频繁发送短信验证码")
 	}
 	if params.ExpireAt == 0 {
@@ -154,7 +150,7 @@ func (ali *Adapter) Verify(phone, code string) error {
 	return nil
 }
 
-func NewAliCloudAdapter(opts ...AliOption) sms.Adapter {
+func NewAliCloudAdapter(opts ...AliOption) sms.SMS {
 	var options AliOptions
 	for _, o := range opts {
 		o(&options)

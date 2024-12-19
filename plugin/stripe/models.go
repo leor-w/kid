@@ -16,10 +16,11 @@ const (
 )
 
 type BuildPaymentLinkConfig struct {
-	TradeNo  string
-	Price    string
-	Quantity int
-	Metadata map[string]string
+	TradeNo     string
+	Price       string
+	Quantity    int
+	Metadata    map[string]string
+	RedirectURI string
 }
 
 const (

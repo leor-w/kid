@@ -68,11 +68,7 @@ func (t *Adapter) Send(params *sms.Config) error {
 		params.Code = utils.RandomSMSCode(6)
 	}
 	task.Code = params.Code
-	ok, err := t.lock.Lock(sms.GetPhoneSendLockKey(params.Phone), time.Minute)
-	if err != nil {
-		return err
-	}
-	if !ok {
+	if !t.lock.Lock(sms.GetPhoneSendLockKey(params.Phone), time.Minute) {
 		return fmt.Errorf("请勿频繁发送短信验证码")
 	}
 	if params.ExpireAt == 0 {
