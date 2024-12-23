@@ -10,6 +10,13 @@ const (
 	SandboxBaseURL = "https://api.storekit-sandbox.itunes.apple.com/inApps/v1"
 )
 
+const (
+	// EnvironmentSandbox 沙箱环境
+	EnvironmentSandbox = "Sandbox"
+	// EnvironmentProduct 生产环境
+	EnvironmentProduct = "Product"
+)
+
 // TransactionHistoryQuery 交易历史查询参数
 // https://developer.apple.com/documentation/appstoreserverapi/get_transaction_history
 type TransactionHistoryQuery struct {

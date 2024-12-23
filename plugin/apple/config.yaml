@@ -1,8 +1,8 @@
 apple:
   pay:
-    isProduct: false # true | false true: 正式环境 false: 沙盒环境
+    is_product: false # true | false true: 正式环境 false: 沙盒环境
     key_id: "kid"
     issuer_id: "issuer_id"
-    bid: "bid"
+    bundle_id: "bid"
     private_key_file: "privateFile"
     private_key: "privateKey"

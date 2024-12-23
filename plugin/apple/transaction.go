@@ -10,10 +10,10 @@ import (
 // VerifyReceipt 验证收据
 func (apple *AppleStore) VerifyReceipt(receipt string) (*gopay.VerifyResponse, error) {
 	verifyUrl := gopay.UrlProd
-	if !apple.options.IsProduct {
+	if !apple.Options.IsProduct {
 		verifyUrl = gopay.UrlSandbox
 	}
-	resp, err := gopay.VerifyReceipt(context.Background(), verifyUrl, apple.options.SharedSecret, receipt)
+	resp, err := gopay.VerifyReceipt(context.Background(), verifyUrl, apple.Options.SharedSecret, receipt)
 	if err != nil {
 		return nil, fmt.Errorf("apple: 验证收据失败: %w", err)
 	}

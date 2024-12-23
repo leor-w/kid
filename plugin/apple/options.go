@@ -10,7 +10,7 @@ type Options struct {
 	SharedSecret   string
 }
 
-func WithSandbox(isProduct bool) Option {
+func WithIsProduct(isProduct bool) Option {
 	return func(o *Options) {
 		o.IsProduct = isProduct
 	}

@@ -14,7 +14,7 @@ import (
 
 type AppleStore struct {
 	client  *gopay.Client
-	options *Options
+	Options *Options
 }
 
 type Option func(*Options)
@@ -30,22 +30,22 @@ func (apple *AppleStore) Provide(ctx context.Context) any {
 		panic(fmt.Sprintf("配置文件为找到 [%s.*]，请检查配置文件", confPrefix))
 	}
 	return New(
-		WithSandbox(config.GetBool(utils.GetConfigurationItem(confPrefix, "sandbox"))),
+		WithIsProduct(config.GetBool(utils.GetConfigurationItem(confPrefix, "is_product"))),
 		WithKeyId(config.GetString(utils.GetConfigurationItem(confPrefix, "key_id"))),
 		WithIssuerId(config.GetString(utils.GetConfigurationItem(confPrefix, "issuer_id"))),
-		WithBid(config.GetString(utils.GetConfigurationItem(confPrefix, "bid"))),
+		WithBid(config.GetString(utils.GetConfigurationItem(confPrefix, "bundle_id"))),
 		WithPrivateKey(config.GetString(utils.GetConfigurationItem(confPrefix, "private_key"))),
 		WithPrivateKeyFile(config.GetString(utils.GetConfigurationItem(confPrefix, "private_key_file"))),
 	)
 }
 
 func (apple *AppleStore) init() error {
-	if apple.options.PrivateKeyFile == "" && apple.options.PrivateKey == "" {
+	if apple.Options.PrivateKeyFile == "" && apple.Options.PrivateKey == "" {
 		return fmt.Errorf("apple: 私钥文件和私钥不能同时为空")
 	}
-	privateKey := apple.options.PrivateKey
+	privateKey := apple.Options.PrivateKey
 	if len(privateKey) <= 0 {
-		privateKeyBytes, err := os.ReadFile(apple.options.PrivateKeyFile)
+		privateKeyBytes, err := os.ReadFile(apple.Options.PrivateKeyFile)
 		if err != nil {
 			return fmt.Errorf("apple: 读取私钥文件失败: %w", err)
 		}
@@ -53,11 +53,11 @@ func (apple *AppleStore) init() error {
 	}
 
 	client, err := gopay.NewClient(
-		apple.options.IssuerId,
-		apple.options.Bid,
-		apple.options.KeyId,
+		apple.Options.IssuerId,
+		apple.Options.Bid,
+		apple.Options.KeyId,
 		privateKey,
-		apple.options.IsProduct,
+		apple.Options.IsProduct,
 	)
 	if err != nil {
 		return fmt.Errorf("apple: 创建客户端失败: %w", err)
@@ -72,7 +72,7 @@ func New(opts ...Option) *AppleStore {
 		opt(options)
 	}
 	var apple AppleStore
-	apple.options = options
+	apple.Options = options
 	if err := apple.init(); err != nil {
 		panic(err)
 	}
