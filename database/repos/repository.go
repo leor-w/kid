@@ -36,6 +36,7 @@ type (
 		Count(*finder.Finder) error
 		Sum(*finder.Sum) error
 		GetTableName(data any) string
+		CreateTable(tableName string, data any) error
 	}
 	// ITxRepository MySQL事务
 	ITxRepository interface {

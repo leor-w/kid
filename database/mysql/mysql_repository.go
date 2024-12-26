@@ -299,3 +299,11 @@ func (repo *Repository) Sum(sum *finder.Sum) error {
 func (repo *Repository) GetTableName(data any) string {
 	return repo.DB.DB.NamingStrategy.TableName(reflect.TypeOf(data).Name())
 }
+
+func (repo *Repository) CreateTable(tableName string, data any) error {
+	if len(tableName) > 0 {
+		return repo.DB.Table(tableName).AutoMigrate(data)
+	} else {
+		return repo.DB.AutoMigrate(data)
+	}
+}
