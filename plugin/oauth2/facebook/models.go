@@ -20,5 +20,6 @@ const (
 )
 
 const (
-	ScopeEmail = "email"
+	ScopeEmail         = "email"          // 用户邮箱
+	ScopePublicProfile = "public_profile" // 用户公开信息
 )

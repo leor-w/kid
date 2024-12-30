@@ -37,6 +37,7 @@ type (
 		Sum(*finder.Sum) error
 		GetTableName(data any) string
 		CreateTable(tableName string, data any) error
+		TableHasExist(tableName string) bool
 	}
 	// ITxRepository MySQL事务
 	ITxRepository interface {

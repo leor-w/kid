@@ -86,7 +86,7 @@ func (oauth *OAuth) getUserInfoByAccessToken(accessToken string) (*plugin.OAuthU
 	// 构建获取用户信息的请求地址
 	userInfoUrl := fmt.Sprintf("%s?fields=%s&access_token=%s",
 		EndpointUserInfo,
-		strings.Join(oauth.options.Scope, ","),
+		strings.Join(oauth.options.Fields, ","),
 		accessToken)
 	// 请求 Facebook Graph API 获取用户信息
 	resp, err := http.Get(userInfoUrl)
@@ -120,6 +120,7 @@ func New(opts ...Option) *OAuth {
 	for _, opt := range opts {
 		opt(&o)
 	}
+	o.Fields = append(o.Fields, "id", "email")
 	return &OAuth{
 		options: o,
 		facebookConfig: oauth2.Config{

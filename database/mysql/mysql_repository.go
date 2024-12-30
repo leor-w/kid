@@ -307,3 +307,7 @@ func (repo *Repository) CreateTable(tableName string, data any) error {
 		return repo.DB.AutoMigrate(data)
 	}
 }
+
+func (repo *Repository) TableHasExist(tableName string) bool {
+	return repo.DB.DB.Migrator().HasTable(tableName)
+}
