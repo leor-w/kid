@@ -7,9 +7,6 @@ import (
 	"fmt"
 
 	"github.com/leor-w/injector"
-
-	"github.com/wechatpay-apiv3/wechatpay-go/services/refunddomestic"
-
 	"github.com/silenceper/wechat/v2"
 	"github.com/silenceper/wechat/v2/cache"
 	"github.com/silenceper/wechat/v2/miniprogram"
@@ -18,12 +15,12 @@ import (
 	oaConf "github.com/silenceper/wechat/v2/officialaccount/config"
 	"github.com/silenceper/wechat/v2/pay"
 	v2PayConf "github.com/silenceper/wechat/v2/pay/config"
-
 	"github.com/wechatpay-apiv3/wechatpay-go/core"
 	"github.com/wechatpay-apiv3/wechatpay-go/core/auth/verifiers"
 	"github.com/wechatpay-apiv3/wechatpay-go/core/downloader"
 	"github.com/wechatpay-apiv3/wechatpay-go/core/notify"
 	"github.com/wechatpay-apiv3/wechatpay-go/core/option"
+	"github.com/wechatpay-apiv3/wechatpay-go/services/refunddomestic"
 	v3Utils "github.com/wechatpay-apiv3/wechatpay-go/utils"
 
 	"github.com/leor-w/kid/config"
