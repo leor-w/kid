@@ -48,9 +48,6 @@ func (oauth *OAuth) Provide(ctx context.Context) any {
 type Option func(o *Options)
 
 func (oauth *OAuth) HandleOAuth2ByAuthCode(code *plugin.VerifyCode) (*plugin.OAuthUser, error) {
-	if !oauth.stateExist(code.State) {
-		return nil, fmt.Errorf("tiktok oauth2: 未知的授权来源或授权链接已过期，请重新授权")
-	}
 	token, err := oauth.FetchAccessToken(code.Code, code.CodeVerifier)
 	if err != nil {
 		return nil, err
@@ -76,27 +73,11 @@ func (oauth *OAuth) HandleOAuth2ByAuthCode(code *plugin.VerifyCode) (*plugin.OAu
 
 // HandleOAuth2ByAPPAuthToken 处理 APP 授权登录
 func (oauth *OAuth) HandleOAuth2ByAPPAuthToken(token string) (*plugin.OAuthUser, error) {
-	userInfo, err := oauth.GetUserInfo(token, nil)
-	if err != nil {
-		return nil, err
-	}
-	if userInfo.Error.Code != "ok" {
-		return nil, fmt.Errorf("获取用户信息失败: 错误类型 %s; 错误信息: %s", userInfo.Error.Code, userInfo.Error.Message)
-	}
-	data, exist := userInfo.Data["user"]
-	if !exist {
-		return nil, errors.New("获取用户信息失败: 未找到用户信息")
-	}
-	return &plugin.OAuthUser{
-		UserId:   data.OpenId,
-		UserName: data.Username,
-		Picture:  data.AvatarURL100,
-	}, nil
+	return nil, errors.New("tiktok oauth2: Tiktok 不支持此方法进行验证")
 }
 
 func (oauth *OAuth) stateExist(state string) bool {
-	exist := oauth.rds.Exists(GetOAuthURLIdentifierKey(state))
-	return exist.Val() > 0
+	return oauth.rds.Exists(GetOAuthURLIdentifierKey(state)).Val() > 0
 }
 
 // BuildAuthPageURL 构建授权页面 URL
