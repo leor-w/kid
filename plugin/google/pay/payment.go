@@ -85,7 +85,7 @@ func (gp *GooglePay) GetConsumable(purchaseConf *PurchaseConfig) (*ProductPurcha
 		return nil, fmt.Errorf("google play: 内购商品支付状态错误，当前状态为: %d", purchase.PurchaseState)
 	}
 	// 如果内购商品已消耗，无法重复消耗
-	if purchase.ConsumptionState == 1 {
+	if purchaseConf.IsConsumed && purchase.ConsumptionState == 1 {
 		return nil, fmt.Errorf("google play: 内购商品已消耗，无法重复消耗")
 	}
 	return &ProductPurchase{

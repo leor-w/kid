@@ -7,6 +7,8 @@ type PurchaseConfig struct {
 	ProductID string `json:"productId"`
 	/* 内购商品购买的 token */
 	PurchaseToken string `json:"purchaseToken"`
+	/* 是否验证已消耗 */
+	IsConsumed bool `json:"isConsumed"`
 }
 
 /*
