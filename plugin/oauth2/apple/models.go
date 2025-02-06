@@ -7,6 +7,14 @@ const (
 	BuildOAuthPageURL = "https://appleid.apple.com/auth/authorize"
 	// EndpointPublicKeyURL Apple OAuth2 获取公钥的请求地址
 	EndpointPublicKeyURL = "https://appleid.apple.com/auth/keys"
+	// EndpointTokenURL Apple OAuth2 获取 Token 的请求地址
+	EndpointTokenURL = "https://appleid.apple.com/auth/token"
+)
+
+const (
+	ScopeOpenId = "openid" // OpenID
+	ScopeEmail  = "email"  // 邮箱
+	ScopeName   = "name"   // 姓名
 )
 
 const (
