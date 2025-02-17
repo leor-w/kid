@@ -186,6 +186,18 @@ func (awsS3 *AwsS3) CompleteMultipartUpload(conf *CompleteMultipartUploadConfig)
 	return nil
 }
 
+// ListFileByPrefix 获取指定前缀的文件列表
+func (awsS3 *AwsS3) ListFileByPrefix(bucket, prefix string) ([]types.Object, error) {
+	objects, err := awsS3.Client().ListObjectsV2(context.Background(), &s3.ListObjectsV2Input{
+		Bucket: &bucket,
+		Prefix: &prefix,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("获取文件列表失败: %s", err.Error())
+	}
+	return objects.Contents, nil
+}
+
 func (awsS3 *AwsS3) DeleteFile(conf *DeleteObjectConfig) error {
 	var owner *string
 	if len(conf.ExpectedBucketOwner) > 0 {

@@ -76,7 +76,7 @@ func (t *Adapter) Send(params *sms.Config) error {
 	}
 	task.ExpireAt = params.ExpireAt
 	// 模拟发送短信验证码, 用于测试
-	if t.options.Analog {
+	if t.options.Analog || params.IsAnalog {
 		task.Code = "888888"
 		task.Status = "success"
 		if err := t.saveTask(params.Phone, task); err != nil {

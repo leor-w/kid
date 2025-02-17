@@ -5,6 +5,7 @@ import "fmt"
 type Config struct {
 	CountryCode string // 国家码, 如: +86, +1 等, 支持国际短信发送的平台需要
 	Phone       string // 手机号
+	IsAnalog    bool   // 本次是否模拟发送, 用于测试
 	Code        string // 验证码, 需要发送的验证码, 可以为空, 由套件自动生成
 	Language    string // 语言, 默认 en, 可以为空, 由套件自动生成
 	Temp        string // 短信模板内容，这个是短信内容的模板，如: "您的验证码是: {code}" 等
