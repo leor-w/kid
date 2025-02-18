@@ -6,7 +6,8 @@ import (
 	"github.com/nyaruka/phonenumbers"
 )
 
-func ValidatePhoneNumber(number string) (bool, string, error) {
+// ValidateInternationalPhoneNumber 验证国际电话号码是否有效
+func ValidateInternationalPhoneNumber(number string) (bool, string, error) {
 	// 解析电话号码
 	parsedNumber, err := phonenumbers.Parse(number, "")
 	if err != nil {
