@@ -42,6 +42,7 @@ require (
 	github.com/leor-w/utils v0.0.3
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/mojocn/base64Captcha v1.3.6
+	github.com/nyaruka/phonenumbers v1.5.0
 	github.com/olivere/elastic v6.2.37+incompatible
 	github.com/qiniu/go-sdk/v7 v7.16.0
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
@@ -151,7 +152,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/nyaruka/phonenumbers v1.5.0 // indirect
 	github.com/onsi/ginkgo/v2 v2.10.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
