@@ -6,10 +6,10 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/logger"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/database/mysql"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/database/mysql"
 	"github.com/spf13/cobra"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/utils"
 	"github.com/spf13/cast"
 )
 

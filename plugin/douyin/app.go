@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/logger"
 )
 
 type App struct {

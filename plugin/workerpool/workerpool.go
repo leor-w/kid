@@ -3,8 +3,8 @@ package workerpool
 import (
 	"context"
 
-	"github.com/leor-w/kid/logger"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/logger"
+	"github.com/lsjhtang/kid/utils"
 )
 
 type Job interface {

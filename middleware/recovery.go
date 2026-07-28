@@ -6,7 +6,7 @@ import (
 	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
-	"github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/logger"
 )
 
 func Recovery(ctx *gin.Context) {

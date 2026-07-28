@@ -10,8 +10,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/leor-w/kid/logger"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/logger"
+	"github.com/lsjhtang/kid/utils"
 
 	"github.com/qiniu/go-sdk/v7/sms/bytes"
 )

@@ -1,4 +1,4 @@
-package container
+package injector
 
 // injectTag 依赖注入标签
 // 值应为 `inject:"别名,选项"`
@@ -9,9 +9,12 @@ package container
 const injectTag = "inject" // 依赖注入标签
 
 const (
-	tagAlias = "alias" // 标签中的别名
-	tagOpts  = "opts"  // 标签中的选项
+	tagAliasKey    = "alias"    // 别名
+	tagScopeKey    = "scope"    // 分组
+	tagOptionalKey = "optional" // 选项
 )
+
+type NameKey struct{}
 
 // TagOption 标签选项
 

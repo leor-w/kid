@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/leor-w/utils"
+	"github.com/lsjhtang/kid/utils"
 	"github.com/spf13/viper"
 )
 

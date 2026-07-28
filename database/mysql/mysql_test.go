@@ -5,7 +5,7 @@ package mysql
 //	"testing"
 //	"time"
 //
-//	"github.com/leor-w/kid/database/repos"
+//	"github.com/lsjhtang/kid/database/repos"
 //)
 //
 //func NewMySQL() *MySQL {

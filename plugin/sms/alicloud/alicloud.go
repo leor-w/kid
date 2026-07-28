@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/leor-w/kid/database/redis"
-	"github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/database/redis"
+	"github.com/lsjhtang/kid/logger"
 
-	"github.com/leor-w/kid/plugin/lock"
+	"github.com/lsjhtang/kid/plugin/lock"
 
 	openapi "github.com/alibabacloud-go/darabonba-openapi/client"
 	"github.com/alibabacloud-go/dysmsapi-20170525/v2/client"
 	"github.com/alibabacloud-go/tea/tea"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
-	"github.com/leor-w/kid/plugin/sms"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/plugin"
+	"github.com/lsjhtang/kid/plugin/sms"
+	"github.com/lsjhtang/kid/utils"
 )
 
 type Adapter struct {

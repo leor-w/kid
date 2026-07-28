@@ -11,14 +11,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/leor-w/kid/config"
+	"github.com/lsjhtang/kid/config"
 
 	redisv8 "github.com/go-redis/redis/v8"
 	"github.com/spf13/cast"
 	"github.com/vmihailenco/msgpack/v5"
 
-	"github.com/leor-w/kid/database/redis"
-	"github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/database/redis"
+	"github.com/lsjhtang/kid/logger"
 )
 
 const (
@@ -268,7 +268,7 @@ func (rq *RedisQueue) watchSystemSignal() {
 	signals := make(chan os.Signal, 1)
 	// 监听所有 Linux 常见的系统退出信号
 	signal.Notify(signals, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT,
-		syscall.SIGILL, syscall.SIGTRAP, syscall.SIGABRT, syscall.SIGUSR2,
+		syscall.SIGILL, syscall.SIGTRAP, syscall.SIGABRT,
 		syscall.SIGBUS, syscall.SIGFPE, syscall.SIGSEGV, syscall.SIGPIPE,
 		syscall.SIGALRM, syscall.SIGTERM)
 	for {

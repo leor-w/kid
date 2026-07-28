@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/utils"
 
 	afs "github.com/alibabacloud-go/afs-20180112/client"
 	rpc "github.com/alibabacloud-go/tea-rpc/client"
-	"github.com/leor-w/kid/config"
+	"github.com/lsjhtang/kid/config"
 )
 
 const endpoint = "afs.aliyuncs.com"

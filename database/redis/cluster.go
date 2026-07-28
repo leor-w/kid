@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/leor-w/kid/config"
+	"github.com/lsjhtang/kid/config"
 )
 
 type ClusterClient struct {

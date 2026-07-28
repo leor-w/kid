@@ -13,11 +13,11 @@ import (
 
 	"github.com/tidwall/gjson"
 
-	robot2 "github.com/leor-w/kid/plugin/robot"
+	robot2 "github.com/lsjhtang/kid/plugin/robot"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/plugin"
+	"github.com/lsjhtang/kid/utils"
 	"github.com/spf13/cast"
 
 	"github.com/imroc/req/v3"

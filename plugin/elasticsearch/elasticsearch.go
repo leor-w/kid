@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 
 	"github.com/elastic/go-elasticsearch/v7"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/utils"
 )
 
 type Elasticsearch struct {

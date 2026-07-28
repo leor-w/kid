@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 
 	"github.com/qiniu/go-sdk/v7/auth"
 
@@ -16,8 +16,8 @@ import (
 
 	"github.com/jinzhu/copier"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/utils"
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
 )

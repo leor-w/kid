@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/leor-w/kid"
+	"github.com/lsjhtang/kid"
 )
 
 func main() {

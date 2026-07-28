@@ -11,14 +11,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/utils"
 
 	redisv8 "github.com/go-redis/redis/v8"
 
-	"github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/logger"
 )
 
 // Consumer 消费者

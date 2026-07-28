@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/logger"
 
-	"github.com/leor-w/kid/database/redis"
+	"github.com/lsjhtang/kid/database/redis"
 )
 
 type Lock interface {

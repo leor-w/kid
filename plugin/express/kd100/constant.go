@@ -1,6 +1,6 @@
 package kd100
 
-import "github.com/leor-w/kid/plugin/express"
+import "github.com/lsjhtang/kid/plugin/express"
 
 const (
 	ResultV2 = "resultv2"

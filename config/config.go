@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/leor-w/kid/config/local"
-	"github.com/leor-w/utils"
+	"github.com/lsjhtang/kid/config/local"
+	"github.com/lsjhtang/kid/utils"
 	"github.com/spf13/cast"
 )
 

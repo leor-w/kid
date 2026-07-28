@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	redis2 "github.com/go-redis/redis/v8"
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/database/redis"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/database/redis"
+	"github.com/lsjhtang/kid/utils"
 )
 
 type RateLimit struct {

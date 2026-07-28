@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/leor-w/kid/guard"
+	"github.com/lsjhtang/kid/guard"
 )
 
 const (

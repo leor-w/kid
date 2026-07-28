@@ -6,9 +6,9 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
-	"github.com/leor-w/injector"
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/injector"
+	"github.com/lsjhtang/kid/utils"
 )
 
 type Controller struct {

@@ -3,13 +3,13 @@ package repos
 import (
 	"context"
 
-	"github.com/leor-w/kid/database/repos/deleter"
+	"github.com/lsjhtang/kid/database/repos/deleter"
 
-	"github.com/leor-w/kid/database/repos/updater"
+	"github.com/lsjhtang/kid/database/repos/updater"
 
-	"github.com/leor-w/kid/database/repos/creator"
+	"github.com/lsjhtang/kid/database/repos/creator"
 
-	"github.com/leor-w/kid/database/repos/finder"
+	"github.com/lsjhtang/kid/database/repos/finder"
 )
 
 type (

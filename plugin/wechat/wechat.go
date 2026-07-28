@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 	"github.com/silenceper/wechat/v2"
 	"github.com/silenceper/wechat/v2/cache"
 	"github.com/silenceper/wechat/v2/miniprogram"
@@ -23,9 +23,9 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/services/refunddomestic"
 	v3Utils "github.com/wechatpay-apiv3/wechatpay-go/utils"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin/wechat/payments"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/plugin/wechat/payments"
+	"github.com/lsjhtang/kid/utils"
 )
 
 const (

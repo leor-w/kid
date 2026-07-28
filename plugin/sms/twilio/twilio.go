@@ -8,16 +8,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/leor-w/kid/database/redis"
-	"github.com/leor-w/kid/plugin/lock"
+	"github.com/lsjhtang/kid/database/redis"
+	"github.com/lsjhtang/kid/plugin/lock"
 
-	"github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/logger"
 
-	"github.com/leor-w/kid/plugin/sms"
+	"github.com/lsjhtang/kid/plugin/sms"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/plugin"
+	"github.com/lsjhtang/kid/utils"
 
 	"github.com/twilio/twilio-go"
 	verify "github.com/twilio/twilio-go/rest/verify/v2"

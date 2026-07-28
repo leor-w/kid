@@ -6,11 +6,11 @@ import (
 	"image/color"
 	"strings"
 
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/utils"
 
-	"github.com/leor-w/kid/config"
+	"github.com/lsjhtang/kid/config"
 	"github.com/mojocn/base64Captcha"
 )
 

@@ -1,8 +1,8 @@
 package simple
 
 import (
-	"github.com/leor-w/kid/plugin/logrus/formatters"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/lsjhtang/kid/plugin/logrus/formatters"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"path"

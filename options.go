@@ -1,6 +1,6 @@
 package kid
 
-import "github.com/leor-w/kid/database/mysql"
+import "github.com/lsjhtang/kid/database/mysql"
 
 type Options struct {
 	Name            string

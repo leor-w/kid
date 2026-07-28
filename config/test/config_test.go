@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/config/local"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/config/local"
 )
 
 type Test struct {

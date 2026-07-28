@@ -7,13 +7,13 @@ import (
 
 	"gorm.io/gorm/clause"
 
-	"github.com/leor-w/kid/database/repos"
-	"github.com/leor-w/kid/database/repos/creator"
-	"github.com/leor-w/kid/database/repos/deleter"
-	"github.com/leor-w/kid/database/repos/finder"
-	"github.com/leor-w/kid/database/repos/updater"
-	"github.com/leor-w/kid/logger"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/database/repos"
+	"github.com/lsjhtang/kid/database/repos/creator"
+	"github.com/lsjhtang/kid/database/repos/deleter"
+	"github.com/lsjhtang/kid/database/repos/finder"
+	"github.com/lsjhtang/kid/database/repos/updater"
+	"github.com/lsjhtang/kid/logger"
+	"github.com/lsjhtang/kid/utils"
 	"gorm.io/gorm"
 )
 
@@ -190,7 +190,10 @@ func (repo *Repository) Save(creator *creator.Creator) error {
 }
 
 func (repo *Repository) Update(updater *updater.Updater) error {
-	db := repo.getTx(updater.Tx).Scopes(Wheres(updater.Wheres.Wheres...))
+	var db = repo.getTx(updater.Tx)
+	if updater.Wheres != nil && len(updater.Wheres.Wheres) > 0 {
+		db = db.Scopes(Wheres(updater.Wheres.Wheres...))
+	}
 	if updater.Debug {
 		db.Debug()
 	}
@@ -208,7 +211,7 @@ func (repo *Repository) Update(updater *updater.Updater) error {
 			Updates(updater.Update).
 			Error
 	}
-	if updater.Fields != nil {
+	if updater.Fields != nil && updater.Model != nil {
 		return db.Model(updater.Model).
 			UpdateColumns(updater.Fields).
 			Error

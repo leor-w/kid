@@ -7,7 +7,7 @@ import (
 	"github.com/silenceper/wechat/v2/officialaccount/oauth"
 	"github.com/spf13/cast"
 
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/utils"
 )
 
 // BuildOauthURL 构建微信授权URL

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/guard"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/guard"
+	"github.com/lsjhtang/kid/utils"
 )
 
 type Jwt struct {

@@ -1,15 +1,13 @@
 package kid
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/container"
-	"github.com/leor-w/kid/logger"
-	"github.com/leor-w/kid/middleware"
-	"github.com/leor-w/kid/plugin"
-	"github.com/leor-w/kid/plugin/logrus"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/injector"
+	"github.com/lsjhtang/kid/logger"
+	"github.com/lsjhtang/kid/middleware"
+	"github.com/lsjhtang/kid/plugin"
+	"github.com/lsjhtang/kid/plugin/logrus"
 )
 
 var (
@@ -30,7 +28,7 @@ type Kid struct {
 	*gin.Engine
 	RouterGroup
 	Logger       logger.Logger
-	IocContainer *container.Container
+	IocContainer *injector.Container
 	Options      *Options
 }
 
@@ -38,28 +36,16 @@ var _defaultKid *Kid
 
 type Option func(*Options)
 
-func Registry(plugin plugin.Plugin, opts ...container.Option) *Kid {
+func Registry(plugin plugin.Plugin, opts ...injector.Option) *Kid {
 	return _defaultKid.Registry(plugin, opts...)
 }
 
 // Registry 将插件注入容器
-func (kid *Kid) Registry(plugin plugin.Plugin, opts ...container.Option) *Kid {
+func (kid *Kid) Registry(plugin plugin.Plugin, opts ...injector.Option) *Kid {
 	if err := kid.IocContainer.Provide(plugin, opts...); err != nil {
 		logger.Fatal(err.Error())
 	}
 	return kid
-}
-
-func (kid *Kid) Get(plugin plugin.Plugin, name ...string) (interface{}, error) {
-	return kid.IocContainer.Get(plugin, name...)
-}
-
-func (kid *Kid) PopulateOne(plugin plugin.Plugin, opts ...container.Option) error {
-	complete, err := kid.IocContainer.PopulateSingle(plugin, opts...)
-	if err != nil || !complete {
-		return fmt.Errorf("PopulateOne: 失败: %w", err)
-	}
-	return nil
 }
 
 func (kid *Kid) Populate() error {
@@ -134,7 +120,7 @@ func New(opts ...Option) *Kid {
 		o(opt)
 	}
 	_defaultKid = &Kid{
-		IocContainer: container.New(),
+		IocContainer: injector.New(),
 		Options:      opt,
 	}
 	if err := _defaultKid.Init(); err != nil {

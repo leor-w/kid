@@ -10,11 +10,11 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/logger"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/logger"
+	"github.com/lsjhtang/kid/utils"
 )
 
 // Express 快递100 SDK

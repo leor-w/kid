@@ -8,9 +8,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/plugin"
+	"github.com/lsjhtang/kid/utils"
 	"github.com/stripe/stripe-go/v81"
 	"github.com/stripe/stripe-go/v81/paymentintent"
 	"github.com/stripe/stripe-go/v81/paymentlink"

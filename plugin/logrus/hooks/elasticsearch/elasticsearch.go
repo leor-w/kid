@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/logger"
 	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
 )

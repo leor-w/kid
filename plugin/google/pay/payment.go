@@ -7,9 +7,9 @@ import (
 	"google.golang.org/api/androidpublisher/v3"
 	"google.golang.org/api/option"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/plugin"
+	"github.com/lsjhtang/kid/utils"
 )
 
 type GooglePay struct {

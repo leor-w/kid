@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/leor-w/kid/database/redis"
+	"github.com/lsjhtang/kid/database/redis"
 )
 
 type RedisBlacklist struct {

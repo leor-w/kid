@@ -11,12 +11,12 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/leor-w/injector"
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/database/redis"
-	"github.com/leor-w/kid/logger"
-	plugin "github.com/leor-w/kid/plugin/oauth2"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/database/redis"
+	"github.com/lsjhtang/kid/injector"
+	"github.com/lsjhtang/kid/logger"
+	plugin "github.com/lsjhtang/kid/plugin/oauth2"
+	"github.com/lsjhtang/kid/utils"
 )
 
 type OAuth struct {

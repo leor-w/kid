@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/leor-w/kid/logger"
-	logger2 "github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/logger"
+	logger2 "github.com/lsjhtang/kid/logger"
 	gLogger "gorm.io/gorm/logger"
 	"gorm.io/gorm/utils"
 )

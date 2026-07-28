@@ -1,8 +1,8 @@
 package logrus
 
 import (
-	"github.com/leor-w/kid/logger"
-	"github.com/leor-w/kid/plugin/logrus/rotates/simple"
+	"github.com/lsjhtang/kid/logger"
+	"github.com/lsjhtang/kid/plugin/logrus/rotates/simple"
 	"testing"
 	"time"
 )

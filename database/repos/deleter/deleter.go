@@ -3,7 +3,7 @@ package deleter
 import (
 	"context"
 
-	"github.com/leor-w/kid/database/repos/where"
+	"github.com/lsjhtang/kid/database/repos/where"
 )
 
 type Deleter struct {

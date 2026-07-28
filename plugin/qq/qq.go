@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/plugin"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/plugin"
 
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/utils"
 )
 
 const (

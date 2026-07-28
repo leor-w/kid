@@ -10,14 +10,14 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 	"github.com/spf13/cast"
 	"golang.org/x/oauth2"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/database/redis"
-	plugin "github.com/leor-w/kid/plugin/oauth2"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/database/redis"
+	plugin "github.com/lsjhtang/kid/plugin/oauth2"
+	"github.com/lsjhtang/kid/utils"
 )
 
 type OAuth struct {

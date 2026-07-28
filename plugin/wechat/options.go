@@ -1,6 +1,6 @@
 package wechat
 
-import "github.com/leor-w/kid/plugin/wechat/payments"
+import "github.com/lsjhtang/kid/plugin/wechat/payments"
 
 type Options struct {
 	MiniProgram             // 小程序配置

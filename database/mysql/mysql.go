@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/leor-w/kid/config"
-	"github.com/leor-w/kid/database/repos/join"
-	"github.com/leor-w/kid/database/repos/where"
-	"github.com/leor-w/kid/utils"
+	"github.com/lsjhtang/kid/config"
+	"github.com/lsjhtang/kid/database/repos/join"
+	"github.com/lsjhtang/kid/database/repos/where"
+	"github.com/lsjhtang/kid/utils"
 
-	"github.com/leor-w/injector"
+	"github.com/lsjhtang/kid/injector"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

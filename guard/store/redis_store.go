@@ -9,9 +9,9 @@ import (
 
 	redis2 "github.com/go-redis/redis/v8"
 
-	"github.com/leor-w/kid/database/redis"
-	"github.com/leor-w/kid/guard"
-	"github.com/leor-w/kid/guard/constant"
+	"github.com/lsjhtang/kid/database/redis"
+	"github.com/lsjhtang/kid/guard"
+	"github.com/lsjhtang/kid/guard/constant"
 )
 
 type RedisStore struct {

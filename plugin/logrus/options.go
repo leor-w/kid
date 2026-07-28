@@ -1,7 +1,7 @@
 package logrus
 
 import (
-	"github.com/leor-w/kid/logger"
+	"github.com/lsjhtang/kid/logger"
 	"github.com/sirupsen/logrus"
 )
 
